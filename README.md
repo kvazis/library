@@ -17,4 +17,4 @@
 <img src="https://raw.githubusercontent.com/kvazis/library/master/img/btc.png" alt="Bitcoin" style="height: 300px !important;width: 300px !important;box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;-webkit-box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;" ></a>
 
 * ETH - 0xD4D06B1B1a6879ce4B36922F6ad96ddf30FD7E1A    
-<img src="https://raw.githubusercontent.com/kvazis/library/master/img/etc.png" alt="Etherium" style="height: 300px !important;width: 300px !important;box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;-webkit-box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;" ></a>
+<img src="https://raw.githubusercontent.com/kvazis/library/master/img/eth.png" alt="Etherium" style="height: 300px !important;width: 300px !important;box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;-webkit-box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;" ></a>
