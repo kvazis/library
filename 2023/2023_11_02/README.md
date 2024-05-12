@@ -65,7 +65,7 @@ curl -fsSL get.docker.com | sh
 
 :ballot_box_with_check: Installing OS-Agent    
 :white_check_mark: [Latest release](https://github.com/home-assistant/os-agent/releases/latest)    
-Downloading - `wget https://github.com/home-assistant/os-agent/releases/download/1.6.0/os-agent_1.6.0_linux_x86_64.deb` (номер меняем на актуальный)    
+Downloading - `wget https://github.com/home-assistant/os-agent/releases/download/1.6.0/os-agent_1.6.0_linux_x86_64.deb` (in the command we write the latest version number)    
 Installing - `dpkg -i os-agent_1.6.0_linux_x86_64.deb`    
 
 :ballot_box_with_check: Installing Home Assisistant Supervised    
