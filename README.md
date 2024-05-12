@@ -8,7 +8,7 @@
 
 #### Or a donation of any amount -     
 * USDT (TRC20) - TUvBLFpVAFiR7Z64MEjkXvZcdf1DGDEYTu    
-a <img src="https://raw.githubusercontent.com/kvazis/library/master/img/usdt.png" alt="USDT TRC20" style="height: 1100px !important;width: 1100px !important;box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;-webkit-box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;" ></a>
+<img src="https://raw.githubusercontent.com/kvazis/library/master/img/usdt.png" alt="USDT TRC20" style="height: 500px !important;width: 500px !important;box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;-webkit-box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;" ></a>
 * TON - UQBEShkfKCFhvqlTs_oIpa6kFIQJguJR30hDXany1cCAbCfe    
 * BTC - bc1qpqma0ndrmxw70y28esdaghu2pl8ttf97nh0ghc    
 * ETH - 0xD4D06B1B1a6879ce4B36922F6ad96ddf30FD7E1A    
