@@ -65,13 +65,13 @@ curl -fsSL get.docker.com | sh
 
 :ballot_box_with_check: Installing OS-Agent    
 :white_check_mark: [Latest release](https://github.com/home-assistant/os-agent/releases/latest)    
-Загружаем - `wget https://github.com/home-assistant/os-agent/releases/download/1.6.0/os-agent_1.6.0_linux_x86_64.deb` (номер меняем на актуальный)    
-Установка - `dpkg -i os-agent_1.6.0_linux_x86_64.deb`    
+Downloading - `wget https://github.com/home-assistant/os-agent/releases/download/1.6.0/os-agent_1.6.0_linux_x86_64.deb` (номер меняем на актуальный)    
+Installing - `dpkg -i os-agent_1.6.0_linux_x86_64.deb`    
 
 :ballot_box_with_check: Installing Home Assisistant Supervised    
 :white_check_mark: [Latest release](https://github.com/home-assistant/supervised-installer/releases)    
-Загружаем - `wget https://github.com/home-assistant/supervised-installer/releases/download/1.5.0/homeassistant-supervised.deb`    
-Установка - `dpkg -i homeassistant-supervised.deb`    
+Downloading - `wget https://github.com/home-assistant/supervised-installer/releases/download/1.5.0/homeassistant-supervised.deb`    
+Installing - `dpkg -i homeassistant-supervised.deb`    
 
 :arrow_right: Web interface Home Assistant - `http://IP adress:8123`    
 
