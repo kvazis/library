@@ -1,8 +1,6 @@
 ## External converters
 
-:point_right: **lumi.remote.acn008** - [Aqara H1M Wireless single rocker WXKG21LM](https://raw.githubusercontent.com/kvazis/training/master/z2m_converters/converters/lumi_switch_acn059.js) - Работает с z2m  1.35.2 (обновлен синтаксис) функционал — управление реле, мощность, режим отвязки клавиш (decoupled mode).    
-
-
+:point_right: **lumi.remote.acn008** - [Aqara H1M Wireless single rocker WXKG21LM](https://raw.githubusercontent.com/kvazis/library/master/ext_converters/js/WXKG21LM.js) - tested on zigbee2mqtt version 1.37.1    
 
 
 ____
