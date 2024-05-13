@@ -1,15 +1,12 @@
 ## Aqara Smart Switch Reviews
 
 ### First model line    
+#### 10.04.2017 [Aqara WXKG03LM, 1 key, wireless](https://youtu.be/dGS2GE25jWQ)    
+#### 01.10.2018 [Aqara WXKG02LM, 2 key, wireless](https://youtu.be/u5yQW--lZpc)    
+#### 09.03.2017 [Aqara QBKG03LM, 2 key, no neutral](https://youtu.be/ZrVVaJ7zE98)    
 
-#### [Aqara WXKG03LM, 1 key, wireless](https://youtu.be/dGS2GE25jWQ) 2017 04 10
 
 
-
-
- - 
-Aqara WXKG02LM, 2 key, wireless - https://youtu.be/u5yQW--lZpc
-Aqara QBKG03LM, 2 key, no neutral - https://youtu.be/ZrVVaJ7zE98
 Aqara QBKG11LM, 1 key, with neutral - https://youtu.be/q9MD2JB-MD8
 Repair of Aqara switch keys (first model line) - https://youtu.be/wJD_EWppbJ4
 
