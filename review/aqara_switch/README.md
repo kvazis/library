@@ -1,17 +1,16 @@
 ## Aqara Smart Switch Reviews
 
-### First model line    
-#### 10.04.2017 [Aqara WXKG03LM, 1 key, wireless](https://youtu.be/dGS2GE25jWQ)    
-#### 01.10.2018 [Aqara WXKG02LM, 2 key, wireless](https://youtu.be/u5yQW--lZpc)    
-#### 09.03.2017 [Aqara QBKG03LM, 2 key, no neutral](https://youtu.be/ZrVVaJ7zE98)    
+### First model series    
+#### 10.04.2017 [Aqara WXKG03LM, 1 key, wireless](https://youtu.be/dGS2GE25jWQ)
+#### 01.10.2018 [Aqara WXKG02LM, 2 key, wireless](https://youtu.be/u5yQW--lZpc)
+#### 09.03.2017 [Aqara QBKG03LM, 2 key, no neutral](https://youtu.be/ZrVVaJ7zE98)
+#### 03.08.2017 [Aqara QBKG11LM, 1 key, with neutral](https://youtu.be/q9MD2JB-MD8)
+#### 08.10.2019 [Repair of Aqara switch keys](https://youtu.be/wJD_EWppbJ4)
+
+### Aqara Opple series    
+#### 29.12.2019 [Aqara Opple WXCJKG11LM, 2 key](https://youtu.be/iPyq4zPePkE)
 
 
-
-Aqara QBKG11LM, 1 key, with neutral - https://youtu.be/q9MD2JB-MD8
-Repair of Aqara switch keys (first model line) - https://youtu.be/wJD_EWppbJ4
-
-Линейка Aqara Opple
-Aqara Opple WXCJKG11LM, 2 key - https://youtu.be/iPyq4zPePkE
 Aqara Opple WXCJKG12LM, 4 key - https://youtu.be/ukanihuqegQ
 Aqara Opple WXCJKG13LM, 6 клавиш - https://youtu.be/W6z6sEs6S-0
 
