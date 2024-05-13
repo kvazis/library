@@ -9,34 +9,31 @@
 
 ### Aqara Opple series    
 #### 29.12.2019 [Aqara Opple WXCJKG11LM, 2 key](https://youtu.be/iPyq4zPePkE)
+#### 10.12.2020 [Aqara Opple WXCJKG12LM, 4 key](https://youtu.be/ukanihuqegQ)
+#### 10.06.2020 [Aqara Opple WXCJKG13LM, 6 клавиш](https://youtu.be/W6z6sEs6S-0)
 
+### Aqara D1 series    
+#### 21.07.2020 [Aqara D1 WXKG07LM, 2 key, wireless](https://youtu.be/pozibaARjJA)
+#### 14.01.2021 [Aqara D1 QBKG22LM, 2 key, no neutral](https://youtu.be/iXX6prtaopM)
+#### 19.06.2020 [Aqara D1 QBKG26LM, 3 key, with neutral](https://youtu.be/2hxKwe-ydsw)
 
-Aqara Opple WXCJKG12LM, 4 key - https://youtu.be/ukanihuqegQ
-Aqara Opple WXCJKG13LM, 6 клавиш - https://youtu.be/W6z6sEs6S-0
+### Aqara H1 / H1 pro series    
+#### 02.12.2021 [Aqara H1 pro QBKG32LM, 3 key, with neutral](https://youtu.be/jpoDhFqH2kk)
+#### 16.12.2021 [Aqara H1 EU WS-EUK04, 2 key, with neutral](https://youtu.be/5YdQ9SSnS_s)
+#### 04.04.2022 [Aqara H1 EU WS-EUK04, 2 key, with neutral, part 2](https://youtu.be/FclHZwS9L54)
 
-Линейка Aqara D1
-Aqara D1 WXKG07LM, 2 key, wireless - https://youtu.be/pozibaARjJA
-Aqara D1 QBKG22LM, 2 key, no neutral - https://youtu.be/iXX6prtaopM
-Aqara D1 QBKG26LM, 3 key, with neutral - https://youtu.be/2hxKwe-ydsw
+### Aqara E1 series    
+#### 20.09.2022 [Aqara E1 WXKG16LM / QBKG38LM, 1 key, wireless и no neutral](https://youtu.be/4eVS10m4nQc)
+#### 28.12.2021 [Aqara E1 WXKG17LM, 2 key, wirelessl](https://youtu.be/RPzrceUSwvM)
+#### 09.11.2022 [Aqara E1 QBKG39LM vs Aqara D1 QBKG22LM  2 key, no neutral](https://youtu.be/raCfN_Gn2MM)
 
-Линейка Aqara H1 / H1 pro
-Aqara H1 pro QBKG32LM, 3 key, with neutral - https://youtu.be/jpoDhFqH2kk
-Aqara H1 EU WS-EUK04, 2 key, with neutral - https://youtu.be/5YdQ9SSnS_s
-Aqara H1 EU WS-EUK04, часть 2 - https://youtu.be/FclHZwS9L54
+### Aqara H1M series    
+#### 29.05.2023 [Aqara H1M ZNQBKG25LM, 2 key, with neutral](https://youtu.be/fZYo7PpAHrg)
 
-Линейка Aqara E1
-Aqara E1 WXKG16LM / QBKG38LM, 1 key, wireless и no neutral - https://youtu.be/4eVS10m4nQc
-Aqara E1 WXKG17LM, 2 key, wireless - https://youtu.be/RPzrceUSwvM
-Aqara E1 QBKG39LM vs Aqara D1 QBKG22LM  2 key, no neutral - https://youtu.be/raCfN_Gn2MM
-
-Линейка Aqara H1M
-Aqara H1M ZNQBKG25LM, 2 key, with neutral - https://youtu.be/fZYo7PpAHrg
-
-Линейка Aqara Z1 / Z1 pro
-Aqara Z1 ZNQBKG39LM, 2 key, с/no neutral - https://youtu.be/EE2J26ywDAQ
-Aqara Z1 pro ZNQBKG45LM, 4 key с диммером - https://youtu.be/C0XdbgY33es
-
-
+### Aqara Z1 / Z1 pro series    
+#### 16.11.2023 [Aqara Z1 ZNQBKG39LM, 2 key, with/no neutral](https://youtu.be/EE2J26ywDAQ)
+#### 25.12.2023 [Aqara Z1 ZNQBKG39LM connect to Xiaomi Gateway 3](https://youtu.be/eD6MI4aHiNo)
+#### 05.22.2024 [Aqara Z1 pro ZNQBKG45LM, 4 key with dimmer](https://youtu.be/C0XdbgY33es)
 
 ____
 <a href="https://www.youtube.com/channel/UCcq9onYHbs6go3kDpfBoqhg?sub_confirmation=1" target="_blank"><img src="https://raw.githubusercontent.com/kvazis/library/master/img/subscribe.png" alt="Subscribe" style="height: 71px !important;width: 174px !important;box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;-webkit-box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;" ></a>     
