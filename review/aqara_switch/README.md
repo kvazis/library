@@ -36,7 +36,7 @@
 #### 05.22.2024 [Aqara Z1 pro ZNQBKG45LM, 4 key with dimmer](https://youtu.be/C0XdbgY33es)
 
 ### Aqara H1 Dimmer 
-#### 21.10.2023 [Aqara H1 ZNXNKG02LM, wirelessl](https://youtu.be/COXf9u72vdU)
+#### 21.10.2023 [Aqara H1 ZNXNKG02LM, wireless](https://youtu.be/COXf9u72vdU)
 
 ____
 <a href="https://www.youtube.com/channel/UCcq9onYHbs6go3kDpfBoqhg?sub_confirmation=1" target="_blank"><img src="https://raw.githubusercontent.com/kvazis/library/master/img/subscribe.png" alt="Subscribe" style="height: 71px !important;width: 174px !important;box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;-webkit-box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;" ></a>     
