@@ -28,6 +28,7 @@
 #### 09.11.2022 [Aqara E1 QBKG39LM vs Aqara D1 QBKG22LM  2 key, no neutral](https://youtu.be/raCfN_Gn2MM)
 
 ### Aqara H1M series    
+#### 15.05.2021 [Aqara H1M WXKG21LM, 1 key, wireless](https://youtu.be/lkplOpR7jJY)
 #### 29.05.2023 [Aqara H1M ZNQBKG25LM, 2 key, with neutral](https://youtu.be/fZYo7PpAHrg)
 
 ### Aqara Z1 / Z1 pro series    
