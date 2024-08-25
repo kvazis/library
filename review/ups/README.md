@@ -10,6 +10,7 @@
 #### 07.06.2023 [DIY DC UPS 1228-12 100 watt part 1](https://youtu.be/7zo3vgSZ62o)
 #### 12.06.2023 [DIY DC UPS 1228-12 100 watt part 2](https://youtu.be/0YcjoluaWmo)
 #### 30.01.2024 [Multiport DC UPS 60 W, with POE 48 V](https://youtu.be/KmltHLFDdsE)
+#### 25.08.2024 [RUISI MD1Pro - DC UPS 25600mAh](https://youtu.be/5CXiwVZs8yw)
 
 ### Upgrade    
 #### 25.03.2023 [APC 650 UPS Upgrade part 1](https://youtu.be/SAfi_6aKyfE)
