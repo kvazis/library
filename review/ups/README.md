@@ -12,6 +12,10 @@
 #### 30.01.2024 [Multiport DC UPS 60 W, with POE 48 V](https://youtu.be/KmltHLFDdsE)
 #### 25.08.2024 [RUISI MD1Pro - DC UPS 25600mAh](https://youtu.be/5CXiwVZs8yw)
 
+### UPS / Charge Power Supply    
+#### 19.05.2024 [MZMW SC-180W - power supply with external battery connection and UPS function](https://youtu.be/xMUhqpTRTLw)
+#### 30.08.2024 [PSC-350-12 - Power supply with battery connection, we make UPS with voltage regulation](https://youtu.be/pVqdNYePFO0)
+
 ### Upgrade    
 #### 25.03.2023 [APC 650 UPS Upgrade part 1](https://youtu.be/SAfi_6aKyfE)
 #### 14.04.2023 [APC 650 UPS Upgrade part 2](https://youtu.be/7ekRAkPX7PQ)
