@@ -48,7 +48,7 @@
 ```yaml    
 
   photo_reolink_telegram:
-    alias: Фотография Reolink E1 zoom и отправка в телеграм
+    alias: Photo Reolink E1 zoom and send to Telegram
     sequence:
        - service: camera.snapshot
          data:
@@ -67,7 +67,7 @@
 ```yaml    
 
   video_reolink_telegram:
-    alias: Запись с камеры Reolink E1 zoom и отправка в телеграм
+    alias: Video Reolink E1 zoom and send to Telegram
     sequence:
     - service: camera.record
       data_template:
