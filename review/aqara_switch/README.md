@@ -28,15 +28,16 @@
 #### 09.11.2022 [Aqara E1 QBKG39LM vs Aqara D1 QBKG22LM  2 key, no neutral](https://youtu.be/raCfN_Gn2MM)
 
 ### Aqara H1M series    
-#### 15.05.2021 [Aqara H1M WXKG21LM, 1 key, wireless](https://youtu.be/lkplOpR7jJY)
+#### 15.05.2024 [Aqara H1M WXKG21LM, 1 key, wireless](https://youtu.be/lkplOpR7jJY)
 #### 29.05.2023 [Aqara H1M ZNQBKG25LM, 2 key, with neutral](https://youtu.be/fZYo7PpAHrg)
 
 ### Aqara Z1 / Z1 pro series    
 #### 16.11.2023 [Aqara Z1 ZNQBKG39LM, 2 key, with/no neutral](https://youtu.be/EE2J26ywDAQ)
 #### 25.12.2023 [Aqara Z1 ZNQBKG39LM connect to Xiaomi Gateway 3](https://youtu.be/eD6MI4aHiNo)
-#### 05.22.2024 [Aqara Z1 pro ZNQBKG45LM, 4 key with dimmer](https://youtu.be/C0XdbgY33es)
+#### 05.02.2024 [Aqara Z1 pro ZNQBKG45LM, 4 key with dimmer](https://youtu.be/C0XdbgY33es)
 
-### Aqara H1 Dimmer 
+### Aqara H1 Dimmer   
+#### 08.07.2024 [Aqara H1 ZNXNKG01LM, wired](https://youtu.be/NhDOlNdGSEo)
 #### 21.10.2023 [Aqara H1 ZNXNKG02LM, wireless](https://youtu.be/COXf9u72vdU)
 
 ____
