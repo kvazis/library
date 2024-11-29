@@ -1,4 +1,4 @@
-### [Xiaomi 2K IP camera MJSXJ03HL, part 2 - reflashing, integration into Home Assistant]( )
+### [Xiaomi 2K IP camera MJSXJ03HL, part 2 - reflashing, integration into Home Assistant](https://youtu.be/JKiatUTnPgo)
 
 <a href="https://www.youtube.com/channel/UCcq9onYHbs6go3kDpfBoqhg?sub_confirmation=1" target="_blank"><img src="https://raw.githubusercontent.com/kvazis/library/master/img/subscribe.png" alt="Subscribe" style="height: 71px !important;width: 174px !important;box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;-webkit-box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;" ></a>     
 <a href="http://kvazis.link/donate" target="_blank"><img src="https://raw.githubusercontent.com/kvazis/library/master/img/donate.png" alt="Donate" style="height: 71px !important;width: 174px !important;box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;-webkit-box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;" ></a>
@@ -12,9 +12,12 @@
 
 
 ```yaml
-
+Image
 http://root:PASSWORD@YOUR_IP/x/image.cgi
+Main stream
 rtsp://thingino:thingino@YOUR_IP:554/ch0
+Substream 
+rtsp://thingino:thingino@YOUR_IP:554/ch1
 
 ```
 
