@@ -400,7 +400,7 @@ automation: !include_dir_merge_list includes/automation
   
 ```
 
-
+### [Automation Example](https://youtu.be/sJ9oIDFpJOU)
 
 
 
