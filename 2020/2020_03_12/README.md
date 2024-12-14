@@ -400,10 +400,9 @@ automation: !include_dir_merge_list includes/automation
   
 ```
 
-### [Automation Example](https://youtu.be/sJ9oIDFpJOU)
+### [Automation Example](https://github.com/kvazis/library/blob/master/2020/2020_03_12/automations.txt)
 
-
-
+### [Scripts Example](https://github.com/kvazis/library/blob/master/2020/2020_03_12/scripts.txt)
 
 ____
 <a href="https://www.youtube.com/channel/UCcq9onYHbs6go3kDpfBoqhg?sub_confirmation=1" target="_blank"><img src="https://raw.githubusercontent.com/kvazis/library/master/img/subscribe.png" alt="Subscribe" style="height: 71px !important;width: 174px !important;box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;-webkit-box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;" ></a>     
