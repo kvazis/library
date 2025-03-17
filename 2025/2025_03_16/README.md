@@ -26,22 +26,30 @@ ha_voice:
                 50: 'п’ятдесят', 60: 'шістдесят', 70: 'сімдесят',
                 80: 'вісімдесят', 90: 'дев’яносто'
               } %}
-              {% set degrees = t | round | int %}
-              {% set tens = (degrees // 10) * 10 %}
-              {% set ones = degrees % 10 %}
               
-              {% if degrees in number_map %}
-                {% set number_text = number_map[degrees] %}
+              {% set degrees = t | round | int %}
+              {% set abs_degrees = degrees | abs %}
+              {% set tens = (abs_degrees // 10) * 10 %}
+              {% set ones = abs_degrees % 10 %}
+              
+              {% if abs_degrees in number_map %}
+                {% set number_text = number_map[abs_degrees] %}
               {% else %}
                 {% set number_text = number_map[tens] + ' ' + number_map[ones] %}
               {% endif %}
     
-              {% if degrees % 10 == 1 and degrees % 100 != 11 %}
-                {{ status }} {{ number_text }} градус
-              {% elif 2 <= degrees % 10 <= 4 and (degrees % 100 < 10 or degrees % 100 >= 20) %}
-                {{ status }} {{ number_text }} градуси
+              {% if degrees < 0 %}
+                {% set prefix = 'нижче нуля ' %}
               {% else %}
-                {{ status }} {{ number_text }} градусів
+                {% set prefix = '' %}
+              {% endif %}
+    
+              {% if abs_degrees % 10 == 1 and abs_degrees % 100 != 11 %}
+                {{ status }} {{ number_text }} градус {{ prefix }}
+              {% elif 2 <= abs_degrees % 10 <= 4 and (abs_degrees % 100 < 10 or abs_degrees % 100 >= 20) %}
+                {{ status }} {{ number_text }} градуси {{ prefix }}
+              {% else %}
+                {{ status }} {{ number_text }} градусів {{ prefix }}
               {% endif %}
 
     automation:
