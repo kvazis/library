@@ -22,7 +22,7 @@ const definition = {
         exposes.numeric('presence_time', ea.STATE_SET).withValueMin(5).withValueMax(28800).withUnit('s').withDescription('Presence clear timeout'),
         exposes.numeric('illuminance_interval', ea.STATE_SET).withValueMin(1).withValueMax(480).withUnit('min').withDescription('Illuminance reporting interval'),
         exposes.binary('led_enable', ea.STATE_SET, 'ON', 'OFF').withDescription('Enable or disable LED indication'),
-        exposes.numeric('temperature_correction', ea.STATE_SET).withValueMin(-30).withValueMax(30).withUnit('°C').withDescription('Temperature correction x10'),
+        exposes.numeric('temperature_correction', ea.STATE_SET).withValueMin(-3).withValueMax(3).withUnit('°C').withDescription('Temperature correction x10'),
         exposes.numeric('humidity_correction', ea.STATE_SET).withValueMin(-10).withValueMax(10).withUnit('%').withDescription('Humidity correction'),
     ],
     meta: {
