@@ -11,14 +11,14 @@
     
     vi __init__.py
 ```
-:ballot_box_with_check: Edit mode – i
-:ballot_box_with_check: Insert line – 0x6184: (rm4pro, "RM4 pro", "Broadlink"),
-:ballot_box_with_check: Exit edit mode – escape
-:ballot_box_with_check: Save – :w
-:ballot_box_with_check: Exit editor – :q!
-:ballot_box_with_check: Exit container – exit
+:ballot_box_with_check: Edit mode – i    
+:ballot_box_with_check: Insert line – 0x6184: (rm4pro, "RM4 pro", "Broadlink"),    
+:ballot_box_with_check: Exit edit mode – escape    
+:ballot_box_with_check: Save – :w     
+:ballot_box_with_check: Exit editor – :q!     
+:ballot_box_with_check: Exit container – exit    
 
-:white_check_mark: Scripts shown in the tutorial
+:white_check_mark: Scripts shown in the tutorial     
 
 ```yaml
 
