@@ -1,4 +1,4 @@
-### [Home Assistant, EcoFlow – LiFePO₄ Battery Training Automation]( )
+### [Home Assistant, EcoFlow – LiFePO₄ Battery Training Automation](https://youtu.be/1OTPQpDAzXo)
 
 <a href="https://www.youtube.com/channel/UCcq9onYHbs6go3kDpfBoqhg?sub_confirmation=1" target="_blank"><img src="https://raw.githubusercontent.com/kvazis/library/master/img/subscribe.png" alt="Subscribe" style="height: 71px !important;width: 174px !important;box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;-webkit-box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;" ></a>     
 <a href="http://kvazis.link/donate" target="_blank"><img src="https://raw.githubusercontent.com/kvazis/library/master/img/donate.png" alt="Donate" style="height: 71px !important;width: 174px !important;box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;-webkit-box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;" ></a>
@@ -211,6 +211,8 @@ river_2_max_train:
           entity_id: binary_sensor.river_2_max_control_notification
           to: 'on' 
         action:         
+    ## Delay for data update
+        - delay: 00:00:05
     ## Telegram notification
         - service: telegram_bot.send_message
           data_template:
