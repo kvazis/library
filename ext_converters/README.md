@@ -10,6 +10,7 @@
 :point_right: **TZE204_m9dzckna** - [Temperature and humidity with external sensor](https://raw.githubusercontent.com/kvazis/library/master/ext_converters/js/TZE204_m9dzckn.js) - tested on zigbee2mqtt version 2+    
 :point_right: **TZE204_no6qtgtl** - [24 GHz Presence Detector](https://raw.githubusercontent.com/kvazis/library/master/ext_converters/js/_TZE204_no6qtgtl.js) - tested on zigbee2mqtt version 2+    
 :point_right: **TZE200_uli8wasj** - [10 GHz Moving Sensor with Illuminance, Temperature and Humidity](https://raw.githubusercontent.com/kvazis/library/master/ext_converters/js/ts0601_uli8wasj.js) - tested on zigbee2mqtt version 2+    
-____
+:point_right: **TZE200_dq8bu0pt** - [Star feather smart switch 4 gangs](https://raw.githubusercontent.com/kvazis/library/master/ext_converters/js/TZE200_dq8bu0pt.js) - tested on zigbee2mqtt version 2+    
+_____
 <a href="https://www.youtube.com/channel/UCcq9onYHbs6go3kDpfBoqhg?sub_confirmation=1" target="_blank"><img src="https://raw.githubusercontent.com/kvazis/library/master/img/subscribe.png" alt="Subscribe" style="height: 71px !important;width: 174px !important;box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;-webkit-box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;" ></a>     
 <a href="http://kvazis.link/donate" target="_blank"><img src="https://raw.githubusercontent.com/kvazis/library/master/img/donate.png" alt="Donate" style="height: 71px !important;width: 174px !important;box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;-webkit-box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;" ></a>
