@@ -5,14 +5,14 @@
 
 #### Text version of the instruction for Tuya and Local Tuya integrations
 
-:ballot_box_with_check: `Cloud — Development — My Cloud Projects`
-:ballot_box_with_check: `Create Cloud Project`
-:ballot_box_with_check: Add `Device Status Notification`
-:ballot_box_with_check: App connection - `Device — Link Tuya App Account — Add App Account`
-:ballot_box_with_check: Settings — Integrations — Add integration — Tuya
-:ballot_box_with_check: From the Authorization page — take `Access ID/Client ID`, `Access Secret/Client Secret`
+:ballot_box_with_check: `Cloud — Development — My Cloud Projects`    
+:ballot_box_with_check: `Create Cloud Project`    
+:ballot_box_with_check: Add `Device Status Notification`    
+:ballot_box_with_check: App connection - `Device — Link Tuya App Account — Add App Account`    
+:ballot_box_with_check: Settings — Integrations — Add integration — Tuya     
+:ballot_box_with_check: From the Authorization page — take `Access ID/Client ID`, `Access Secret/Client Secret`    
 
-:ballot_box_with_check: HACS
+:ballot_box_with_check: HACS    
 
 ```yaml
 sudo bash
