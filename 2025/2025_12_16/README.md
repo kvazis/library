@@ -1,0 +1,522 @@
+### [Home Assistant, hands-on: restoring frozen devices]( )
+
+<a href="https://www.youtube.com/channel/UCcq9onYHbs6go3kDpfBoqhg?sub_confirmation=1" target="_blank"><img src="https://raw.githubusercontent.com/kvazis/library/master/img/subscribe.png" alt="Subscribe" style="height: 71px !important;width: 174px !important;box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;-webkit-box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;" ></a>     
+<a href="http://kvazis.link/donate" target="_blank"><img src="https://raw.githubusercontent.com/kvazis/library/master/img/donate.png" alt="Donate" style="height: 71px !important;width: 174px !important;box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;-webkit-box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;" ></a>
+
+
+#### Package:  
+
+```yaml
+lr_reboot:
+
+
+    template:
+
+      - binary_sensor:
+      
+    # Сенсор, що визначає недоступність люстри 1
+          - name: lr_ceiling_1_unavailable
+            unique_id: lr_ceiling_1_unavailable
+            state: >
+              {{ is_state('light.yeelight_ceiling4_0x49c726b', 'unavailable') }}
+            delay_on: 
+                minutes: 5
+            device_class: problem
+            
+    # Сенсор, що визначає недоступність люстри 1
+          - name: lr_ceiling_2_unavailable
+            unique_id: lr_ceiling_2_unavailable
+            state: >
+              {{ is_state('light.yeelight_ceiling4_0x4a1dacd', 'unavailable') }}
+            delay_on: 
+                minutes: 5
+            device_class: problem       
+
+    # Сенсор, що визначає недоступність шлюзу Mi
+          - name: lr_migateway_unavailable
+            unique_id: lr_migateway_unavailable
+            state: >
+              {{ is_state('light.gateway_light_34ce0088b039', 'unavailable') }}
+            delay_on: 
+                minutes: 3
+            device_class: problem  
+
+    # Сенсор, що визначає недоступність IR контролера Broadlink
+          - name: lr_broadlink_ir_unavailable
+            unique_id: lr_broadlink_ir_unavailable
+            state: >
+              {{ is_state('sensor.lr_broadlin_ir_temperature', 'unavailable') }}
+            delay_on: 
+                minutes: 2
+            device_class: problem 
+            
+    # Сенсор, що визначає вимикача люстри балкону вітальні
+          - name: lr_balkony_switch_unavailable
+            unique_id: lr_balkony_switch_unavailable
+            state: >
+              {{ is_state('switch.0x54ef441000681a6f_right', 'unavailable') }}
+            delay_on: 
+                minutes: 2
+            device_class: problem 
+
+
+    input_button:
+
+      lr_ceiling_1_reset:
+        name: LR ceiling 1 reboot
+        
+      lr_ceiling_2_reset:
+        name: LR ceiling 2 reboot
+        
+      lr_gateway_reset:
+        name: LR Mi Gateway reboot
+
+
+    input_number:
+    
+      lr_ceiling_1_reboot_attempts:
+        name: LR ceiling 1 reboot
+        min: 0
+        max: 3
+        step: 1
+        
+      lr_ceiling_2_reboot_attempts:
+        name: LR ceiling 2 reboot
+        min: 0
+        max: 3
+        step: 1
+
+      lr_gateway_reboot_attempts:
+        name: LR mi gateway reboot
+        min: 0
+        max: 3
+        step: 1
+
+      lr_broadlink_ir_reboot_attempts:
+        name: LR broadlink IR reboot
+        min: 0
+        max: 3
+        step: 1
+        
+      lr_balkony_switch_reboot_attempts:
+        name: LR balkony_switch reboot
+        min: 0
+        max: 3
+        step: 1
+
+
+
+    automation:
+
+#################### Перезавантаження люстр ####################
+              
+      - alias: lr_reboot_ceiling_1
+        id: lr_reboot_ceiling_1
+        description: Вітальня — перезавантаження люстри 1
+        initial_state: true
+
+        trigger:
+    # Перевірка раз в 5 хвилин
+        - platform: time_pattern
+          minutes: '/5'
+    # Ручне перезавантаження
+        - platform: state
+          entity_id: input_button.lr_ceiling_1_reset
+          
+        condition:
+    # Перемикач режиму роботи серверу
+        - condition: state
+          entity_id: switch.control_mode
+          state: 'on'
+    # Сенсор що визначає недоступність люстри
+        - condition: state
+          entity_id: binary_sensor.lr_ceiling_1_unavailable
+          state: 'on'
+    # Сенсор електрики
+        - condition: state
+          entity_id: binary_sensor.blackout_after
+          state: 'off' 
+    # Кількість спроб
+        - condition: template
+          value_template: "{{ states('input_number.lr_ceiling_1_reboot_attempts')|int < 3 }}"
+
+        action:
+    # Перезавантаження по живленню
+        - service: switch.turn_off
+          entity_id: switch.0x54ef4410008e96fd_top
+        - delay: 00:00:05
+        - service: switch.turn_on
+          entity_id: switch.0x54ef4410008e96fd_top
+        - service: input_number.increment
+          entity_id: input_number.lr_ceiling_1_reboot_attempts
+        - service: telegram_bot.send_message
+          data_template:
+            target:
+                - !secret chat_id_log
+            message: | 
+                 {{"\U0001F916"}} Вітальня — перезавантаження люстри 1 (спроба {{ states('input_number.lr_ceiling_1_reboot_attempts')|int }} з 3) {{ states('sensor.time_date') }}   
+
+      - alias: reset_lr_ceiling_1_reboot_attempts
+        id: reset_lr_ceiling_1_reboot_attempts
+        description: Вітальня — скидання спроб перезавантажень люстри 1
+        initial_state: true
+
+        trigger:
+          - platform: state
+            entity_id: binary_sensor.lr_ceiling_1_unavailable
+            from: "on"
+            to: "off"
+
+        condition:
+    # Перемикач режиму роботи серверу
+        - condition: state
+          entity_id: switch.control_mode
+          state: 'on'
+    # Ознака спрацювання 1 автоматизації
+        - condition: template
+          value_template: "{{ states('input_number.lr_ceiling_1_reboot_attempts')|int > 0 }}"          
+
+        action:
+          - service: input_number.set_value
+            entity_id: input_number.lr_ceiling_1_reboot_attempts
+            data:
+              value: 0
+          - service: telegram_bot.send_message
+            data_template:
+              target:
+                - !secret chat_id_log
+              message: | 
+                 {{"\U0001F916"}} Вітальня - люстра 1 успішно відновила роботу, лічильник скинуто         
+              
+
+          
+      - alias: lr_reboot_ceiling_2
+        id: lr_reboot_ceiling_2
+        description: Вітальня — перезавантаження люстри 1
+        initial_state: true
+        trigger:
+    # Перевірка раз в 5 хвилин
+        - platform: time_pattern
+          minutes: '/5'
+    # Ручне перезавантаження
+        - platform: state
+          entity_id: input_button.lr_ceiling_2_reset
+
+        condition:
+    # Перемикач режиму роботи серверу
+        - condition: state
+          entity_id: switch.control_mode
+          state: 'on'
+    # Сенсор що визначає недоступність люстри
+        - condition: state
+          entity_id: binary_sensor.lr_ceiling_2_unavailable
+          state: 'on'
+    # Сенсор електрики
+        - condition: state
+          entity_id: binary_sensor.blackout_after
+          state: 'off' 
+    # Кількість спроб
+        - condition: template
+          value_template: "{{ states('input_number.lr_ceiling_2_reboot_attempts')|int < 3 }}"
+        action:
+    # Перезавантаження по живленню
+        - service: switch.turn_off
+          entity_id: switch.0x842e14fffee5451a
+        - delay: 00:00:05
+        - service: switch.turn_on
+          entity_id: switch.0x842e14fffee5451a
+        - service: input_number.increment
+          entity_id: input_number.lr_ceiling_2_reboot_attempts
+        - service: telegram_bot.send_message
+          data_template:
+            target:
+                - !secret chat_id_log
+            message: | 
+                 {{"\U0001F916"}} Вітальня — перезавантаження люстри 2 (спроба {{ states('input_number.lr_ceiling_2_reboot_attempts')|int }} з 3) {{ states('sensor.time_date') }}  
+
+          
+      - alias: reset_lr_ceiling_2_reboot_attempts
+        id: reset_lr_ceiling_2_reboot_attempts
+        description: Вітальня — скидання спроб перезавантажень люстри 2
+        initial_state: true
+
+        trigger:
+          - platform: state
+            entity_id: binary_sensor.lr_ceiling_2_unavailable
+            from: "on"
+            to: "off"
+
+        condition:
+    # Перемикач режиму роботи серверу
+        - condition: state
+          entity_id: switch.control_mode
+          state: 'on'
+    # Ознака спрацювання 1 автоматизації
+        - condition: template
+          value_template: "{{ states('input_number.lr_ceiling_2_reboot_attempts')|int > 0 }}"  
+
+        action:
+          - service: input_number.set_value
+            entity_id: input_number.lr_ceiling_2_reboot_attempts
+            data:
+              value: 0
+          - service: telegram_bot.send_message
+            data_template:
+              target:
+                - !secret chat_id_log
+              message: | 
+                 {{"\U0001F916"}} Вітальня - люстра 2 успішно відновила роботу, лічильник скинуто     
+    
+#################### Перезавантаження шлюза xiaomi ####################
+
+      - alias: lr_reboot_gateway
+        id: lr_reboot_gateway
+        description: Вітальня — перезавантаження шлюза xiaomi
+        initial_state: true
+
+        trigger:
+    # Перевірка раз в 5 хвилин
+        - platform: time_pattern
+          minutes: '/5'
+    # Ручне перезавантаження
+        - platform: state
+          entity_id: input_button.lr_gateway_reset
+
+        condition:
+    # Перемикач режиму роботи серверу
+        - condition: state
+          entity_id: switch.control_mode
+          state: 'on'
+    # Сенсор що визначає недоступність шлюзу
+        - condition: state
+          entity_id: binary_sensor.lr_migateway_unavailable
+          state: 'on'
+    # Сенсор електрики
+        - condition: state
+          entity_id: binary_sensor.blackout_after
+          state: 'off' 
+    # Кількість спроб
+        - condition: template
+          value_template: "{{ states('input_number.lr_gateway_reboot_attempts')|int < 3 }}"
+
+        action:
+    # Перезавантаження по живленню
+        - service: switch.turn_off
+          entity_id:
+            - switch.0xa4c1387c6584d955
+        - delay: 00:00:03
+        - service: switch.turn_on
+          entity_id:
+            - switch.0xa4c1387c6584d955
+        - service: input_number.increment
+          entity_id: input_number.lr_gateway_reboot_attempts
+        - service: telegram_bot.send_message
+          data_template:
+            target:
+                - !secret chat_id_log
+            message: | 
+                 {{"\U0001F916"}} Вітальня — перезавантаження шлюза xiaomi (спроба {{ states('input_number.lr_gateway_reboot_attempts')|int }} з 3) {{ states('sensor.time_date') }}  
+        - delay: 00:00:15 
+        - service: homeassistant.reload_config_entry
+          data: {}
+          target:
+             entity_id: light.gateway_light_34ce0088b039
+             
+      - alias: reset_lr_reboot_gateway_attempts
+        id: reset_lr_reboot_gateway_attempts
+        description: Вітальня — скидання спроб перезавантажень шлюза xiaomi
+        initial_state: true
+
+        trigger:
+          - platform: state
+            entity_id: binary_sensor.lr_migateway_unavailable
+            from: "on"
+            to: "off"
+
+        condition:
+    # Перемикач режиму роботи серверу
+        - condition: state
+          entity_id: switch.control_mode
+          state: 'on'
+    # Ознака спрацювання 1 автоматизації
+        - condition: template
+          value_template: "{{ states('input_number.lr_gateway_reboot_attempts')|int > 0 }}"  
+ 
+        action:
+          - service: input_number.set_value
+            entity_id: input_number.lr_gateway_reboot_attempts
+            data:
+              value: 0
+          - service: telegram_bot.send_message
+            data_template:
+              target:
+                - !secret chat_id_log
+              message: | 
+                 {{"\U0001F916"}} Вітальня - шлюз xiaomi успішно відновив роботу, лічильник скинуто 
+             
+
+#################### Перезавантаження IR контролера Broadlink ####################
+              
+      - alias: lr_reboot_broadlink_ir
+        id: lr_reboot_broadlink_ir
+        description: Вітальня — перезавантаження IR контролера Broadlink
+        initial_state: true
+
+        trigger:
+    # Перевірка раз в 5 хвилин
+        - platform: time_pattern
+          minutes: '/5'
+
+        condition:
+    # Перемикач режиму роботи серверу
+        - condition: state
+          entity_id: switch.control_mode
+          state: 'on'
+    # Сенсор що визначає недоступність IR контролера
+        - condition: state
+          entity_id: binary_sensor.lr_broadlink_ir_unavailable
+          state: 'on'
+    # Сенсор електрики
+        - condition: state
+          entity_id: binary_sensor.blackout_after
+          state: 'off' 
+    # Кількість спроб
+        - condition: template
+          value_template: "{{ states('input_number.lr_broadlink_ir_reboot_attempts')|int < 3 }}"
+
+        action:
+    # Перезавантаження по живленню
+        - service: switch.turn_off
+          entity_id: switch.smart_power_strip_44eu_w_socket_5
+        - delay: 00:00:05
+        - service: switch.turn_on
+          entity_id: switch.smart_power_strip_44eu_w_socket_5
+        - service: input_number.increment
+          entity_id: input_number.lr_broadlink_ir_reboot_attempts
+        - service: telegram_bot.send_message
+          data_template:
+            target:
+                - !secret chat_id_log
+            message: | 
+                 {{"\U0001F916"}} Вітальня — перезавантаження IR контролера Broadlink (спроба {{ states('input_number.lr_broadlink_ir_reboot_attempts')|int }} з 3) {{ states('sensor.time_date') }}  
+                 
+      - alias: reset_lr_reboot_broadlink_ir_attempts
+        id: reset_lr_reboot_broadlink_ir_attempts
+        description: Вітальня — скидання спроб перезавантажень IR контролера Broadlink
+        initial_state: true
+
+        trigger:
+          - platform: state
+            entity_id: binary_sensor.lr_broadlink_ir_unavailable
+            from: "on"
+            to: "off"
+
+        condition:
+    # Перемикач режиму роботи серверу
+        - condition: state
+          entity_id: switch.control_mode
+          state: 'on'
+    # Ознака спрацювання 1 автоматизації
+        - condition: template
+          value_template: "{{ states('input_number.lr_broadlink_ir_reboot_attempts')|int > 0 }}"  
+
+        action:
+          - service: input_number.set_value
+            entity_id: input_number.lr_broadlink_ir_reboot_attempts
+            data:
+              value: 0
+          - service: telegram_bot.send_message
+            data_template:
+              target:
+                - !secret chat_id_log
+              message: | 
+                 {{"\U0001F916"}} Вітальня - IR контролер Broadlink успішно відновив роботу, лічильник скинуто                  
+                 
+                 
+#################### Перезавантаження вимикача люстри балкону ####################
+                 
+      - alias: lr_reboot_balcony_switch_e1
+        id: lr_reboot_balcony_switch_e1
+        description: Вітальня — відновлення роботи вимикача Aqara E1 на вході балкону
+        initial_state: true
+
+        trigger:
+    # Перевірка раз в 15 хвилин
+        - platform: time_pattern
+          minutes: '/15'
+        condition:
+    # Перемикач режиму роботи серверу
+        - condition: state
+          entity_id: switch.control_mode
+          state: 'on'
+    # Сенсор що визначає недоступність вимикача
+        - condition: state
+          entity_id: binary_sensor.lr_balkony_switch_unavailable
+          state: 'on'
+    # Сенсор електрики
+        - condition: state
+          entity_id: binary_sensor.blackout_after
+          state: 'off' 
+    # Кількість спроб
+        - condition: template
+          value_template: "{{ states('input_number.lr_balkony_switch_reboot_attempts')|int < 3 }}"
+
+        action:
+    # Вмикаємо люстру, щоб підвищити споживану потужність на вимикачі
+        - service: light.turn_on
+          entity_id:
+            - light.0xa4c13812b94c8365
+          data_template:
+            brightness_pct: 100
+            kelvin: 4000
+        - delay: 00:00:10
+        - service: light.turn_off
+          entity_id:
+            - light.0xa4c13812b94c8365
+        - service: input_number.increment
+          entity_id: input_number.lr_balkony_switch_reboot_attempts
+        - service: telegram_bot.send_message
+          data_template:
+            target:
+                - !secret chat_id_log
+            message: | 
+                 {{"\U0001F916"}} Вітальня — відновлення роботи вимикача люстри балкону (спроба {{ states('input_number.lr_balkony_switch_reboot_attempts')|int }} з 3) {{ states('sensor.time_date') }}  
+                 
+      - alias: reset_lr_reboot_balcony_switch_e1_attempts
+        id: reset_lr_reboot_balcony_switch_e1_attempts
+        description: Вітальня — скидання спроб відновлення роботи вимикача Aqara E1 на вході балкону
+        initial_state: true
+
+        trigger:
+          - platform: state
+            entity_id: binary_sensor.lr_balkony_switch_unavailable
+            from: "on"
+            to: "off"
+
+        condition:
+    # Перемикач режиму роботи серверу
+        - condition: state
+          entity_id: switch.control_mode
+          state: 'on'
+    # Ознака спрацювання 1 автоматизації
+        - condition: template
+          value_template: "{{ states('input_number.lr_balkony_switch_reboot_attempts')|int > 0 }}"  
+
+        action:
+          - service: input_number.set_value
+            entity_id: input_number.lr_balkony_switch_reboot_attempts
+            data:
+              value: 0
+          - service: telegram_bot.send_message
+            data_template:
+              target:
+                - !secret chat_id_log
+              message: | 
+                 {{"\U0001F916"}} Вітальня - вимикач люстри балкону успішно відновив роботу, лічильник скинуто   
+        
+```
+
+
+____
+<a href="https://www.youtube.com/channel/UCcq9onYHbs6go3kDpfBoqhg?sub_confirmation=1" target="_blank"><img src="https://raw.githubusercontent.com/kvazis/library/master/img/subscribe.png" alt="Subscribe" style="height: 71px !important;width: 174px !important;box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;-webkit-box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;" ></a>     
+<a href="http://kvazis.link/donate" target="_blank"><img src="https://raw.githubusercontent.com/kvazis/library/master/img/donate.png" alt="Donate" style="height: 71px !important;width: 174px !important;box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;-webkit-box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;" ></a>
