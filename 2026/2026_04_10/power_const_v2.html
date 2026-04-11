@@ -1,0 +1,1657 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Phase YAML Constructor</title>
+  <style>
+    :root {
+      --bg: #081120;
+      --card: #0f172a;
+      --text: #e5e7eb;
+      --muted: #9ca3af;
+      --border: #243041;
+      --input: #09101d;
+      --primary: #57a8e8;
+      --danger: #dc2626;
+      --ok: #16a34a;
+      --warn: #d97706;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: linear-gradient(180deg, #030712 0%, #081120 100%);
+      color: var(--text);
+    }
+    .wrap { max-width: 1520px; margin: 0 auto; padding: 20px; display: grid; gap: 16px; }
+    .card { background: rgba(15, 23, 42, 0.96); border: 1px solid var(--border); border-radius: 18px; padding: 18px; }
+    h1,h2,h3 { margin: 0 0 12px; }
+    .muted { color: var(--muted); }
+    .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+    .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+    .stack { display: grid; gap: 12px; }
+    label { display: block; font-size: 14px; margin-bottom: 6px; color: #cbd5e1; }
+    input, select, textarea, button {
+      width: 100%; border-radius: 12px; border: 1px solid var(--border);
+      background: var(--input); color: var(--text); padding: 10px 12px; font-size: 14px;
+    }
+    textarea { min-height: 320px; resize: vertical; font-family: Consolas, monospace; line-height: 1.4; }
+    button { border: 0; cursor: pointer; background: var(--primary); font-weight: 700; }
+    .secondary { background: #334155; }
+    .success { background: var(--ok); }
+    .danger { background: var(--danger); }
+    .warning { background: var(--warn); }
+    .check {
+      display: flex; align-items: center; gap: 8px; border: 1px solid var(--border);
+      border-radius: 12px; padding: 10px 12px; background: var(--input);
+    }
+    .check input { width: auto; margin: 0; }
+    .phase-title { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+    .pill {
+      display: inline-block; padding: 4px 10px; border-radius: 999px; font-size: 12px;
+      background: #143a62; color: #bfdbfe; border: 1px solid #1d4f82;
+      white-space: nowrap;
+    }
+    .hidden { display: none !important; }
+    .actions { display: flex; flex-wrap: wrap; gap: 12px; }
+    table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    th, td { padding: 10px 8px; border-bottom: 1px solid var(--border); text-align: left; vertical-align: top; }
+    .note {
+      border-left: 3px solid var(--primary); padding-left: 12px; color: var(--muted); font-size: 13px;
+    }
+    .row-actions {
+      display: flex; flex-wrap: wrap; gap: 8px;
+    }
+    .row-actions button {
+      width: auto;
+      min-width: 78px;
+      padding: 8px 12px;
+    }
+    .child-picker {
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: var(--input);
+      padding: 10px 12px;
+      max-height: 280px;
+      overflow: auto;
+      display: grid;
+      gap: 8px;
+    }
+    .child-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 8px 6px;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+    .child-item:last-child { border-bottom: 0; }
+    .child-item input {
+      width: auto;
+      margin-top: 2px;
+      flex: 0 0 auto;
+    }
+    .child-meta { display: grid; gap: 2px; }
+    .child-main { font-size: 14px; color: var(--text); }
+    .child-sub { font-size: 12px; color: var(--muted); }
+    @media (max-width: 1100px) {
+      .grid-4, .grid-3, .grid-2 { grid-template-columns: 1fr; }
+      .row-actions { flex-direction: column; }
+      .row-actions button { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card">
+      <h1>Phase YAML Constructor</h1>
+      <div class="muted">Single-file local Home Assistant package generator for phase load attribution.</div>
+    </div>
+
+    <div id="setupCard" class="card stack">
+      <h2>New project</h2>
+      <div class="muted">If you do not have a project JSON yet, fill in the base fields and start from scratch.</div>
+      <div class="grid-4">
+        <div><label>Package name</label><input id="setupPackageName" placeholder="phase_sensor" /></div>
+        <div><label>Mode</label><select id="setupMode"><option value="3">3 phases</option><option value="1">1 phase</option></select></div>
+        <div><label>Date</label><input id="setupDate" readonly /></div>
+        <div><label>Settings file name</label><input id="setupConfigFileName" value="phase_constructor_project.json" /></div>
+      </div>
+      <div class="actions">
+        <button id="startBtn" class="success">Start</button>
+        <button id="importProjectBtn" class="secondary">Import project JSON</button>
+        <input type="file" id="importProjectFile" class="hidden" accept="application/json" />
+      </div>
+    </div>
+
+    <div id="app" class="hidden stack">
+      <div class="card stack">
+        <h2>General settings</h2>
+        <div class="grid-4">
+          <div><label>Package name</label><input id="packageName" /></div>
+          <div><label>Mode</label><select id="mode"><option value="3">3 phases</option><option value="1">1 phase</option></select></div>
+          <div><label>Date</label><input id="updatedDate" readonly /></div>
+          <div><label>Settings file</label><input id="configFileName" placeholder="phase_constructor_project.json" /></div>
+        </div>
+        <div class="grid-2">
+          <div><label>YAML file</label><input id="yamlFileName" placeholder="phase_sensor.yaml" /></div>
+          <div><label>Last generated</label><input id="lastGeneratedInfo" readonly /></div>
+        </div>
+        <div class="note">The constructor UI is always in English. Friendly names in YAML are kept exactly as you enter them. The update date comment is inserted automatically when YAML is generated or downloaded.</div>
+      </div>
+
+      <div class="card stack">
+        <h3>Input power sensors</h3>
+        <div id="inputs3Wrap" class="grid-3">
+          <div><label>Power sensor L1</label><input id="inputL1" placeholder="sensor.deye_sun15_load_l1_power" /></div>
+          <div><label>Power sensor L2</label><input id="inputL2" placeholder="sensor.deye_sun15_load_l2_power" /></div>
+          <div><label>Power sensor L3</label><input id="inputL3" placeholder="sensor.deye_sun15_load_l3_power" /></div>
+        </div>
+        <div id="inputs1Wrap" class="hidden"><label>Total power sensor</label><input id="inputSingle" placeholder="sensor.main_power" /></div>
+      </div>
+
+      <div id="phaseColumns" class="grid-3">
+        <div class="card phase-card" data-phase="l1">
+          <div class="phase-title"><h2 class="phase-label">Phase 1</h2><span class="pill">L1</span></div>
+          <div class="stack">
+            <div><label>Internal ID</label><input class="field-id" placeholder="kitchen_kettle" /></div>
+            <div><label>Name</label><input class="field-name" /></div>
+            <div class="check"><input type="checkbox" class="field-calc" id="calc-l1"><label for="calc-l1">Calculated</label></div>
+            <div class="check hidden light-check-wrap"><input type="checkbox" class="field-light" id="light-l1"><label for="light-l1">Light fixture</label></div>
+            <div class="measured-wrap"><label>Source power sensor</label><input class="field-source" placeholder="sensor.xxx_power" /></div>
+            <div class="calc-wrap hidden stack">
+              <div><label>Entity</label><input class="field-entity" placeholder="switch.xxx or light.xxx" /></div>
+              <div class="fixed-wrap"><label>Power</label><input class="field-power" type="number" min="0" step="0.1" /></div>
+              <div class="light-wrap hidden grid-2">
+                <div><label>Min power</label><input class="field-min-power" type="number" min="0" step="0.1" /></div>
+                <div><label>Max power</label><input class="field-max-power" type="number" min="0" step="0.1" /></div>
+              </div>
+            </div>
+            <button class="add-btn">Add</button>
+          </div>
+        </div>
+
+        <div class="card phase-card" data-phase="l2">
+          <div class="phase-title"><h2 class="phase-label">Phase 2</h2><span class="pill">L2</span></div>
+          <div class="stack">
+            <div><label>Internal ID</label><input class="field-id" placeholder="kitchen_kettle" /></div>
+            <div><label>Name</label><input class="field-name" /></div>
+            <div class="check"><input type="checkbox" class="field-calc" id="calc-l2"><label for="calc-l2">Calculated</label></div>
+            <div class="check hidden light-check-wrap"><input type="checkbox" class="field-light" id="light-l2"><label for="light-l2">Light fixture</label></div>
+            <div class="measured-wrap"><label>Source power sensor</label><input class="field-source" placeholder="sensor.xxx_power" /></div>
+            <div class="calc-wrap hidden stack">
+              <div><label>Entity</label><input class="field-entity" placeholder="switch.xxx or light.xxx" /></div>
+              <div class="fixed-wrap"><label>Power</label><input class="field-power" type="number" min="0" step="0.1" /></div>
+              <div class="light-wrap hidden grid-2">
+                <div><label>Min power</label><input class="field-min-power" type="number" min="0" step="0.1" /></div>
+                <div><label>Max power</label><input class="field-max-power" type="number" min="0" step="0.1" /></div>
+              </div>
+            </div>
+            <button class="add-btn">Add</button>
+          </div>
+        </div>
+
+        <div class="card phase-card" data-phase="l3">
+          <div class="phase-title"><h2 class="phase-label">Phase 3</h2><span class="pill">L3</span></div>
+          <div class="stack">
+            <div><label>Internal ID</label><input class="field-id" placeholder="kitchen_kettle" /></div>
+            <div><label>Name</label><input class="field-name" /></div>
+            <div class="check"><input type="checkbox" class="field-calc" id="calc-l3"><label for="calc-l3">Calculated</label></div>
+            <div class="check hidden light-check-wrap"><input type="checkbox" class="field-light" id="light-l3"><label for="light-l3">Light fixture</label></div>
+            <div class="measured-wrap"><label>Source power sensor</label><input class="field-source" placeholder="sensor.xxx_power" /></div>
+            <div class="calc-wrap hidden stack">
+              <div><label>Entity</label><input class="field-entity" placeholder="switch.xxx or light.xxx" /></div>
+              <div class="fixed-wrap"><label>Power</label><input class="field-power" type="number" min="0" step="0.1" /></div>
+              <div class="light-wrap hidden grid-2">
+                <div><label>Min power</label><input class="field-min-power" type="number" min="0" step="0.1" /></div>
+                <div><label>Max power</label><input class="field-max-power" type="number" min="0" step="0.1" /></div>
+              </div>
+            </div>
+            <button class="add-btn">Add</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="card stack">
+        <div class="phase-title"><h2>Added sensors</h2><span id="countPill" class="pill">0</span></div>
+        <div style="overflow:auto;">
+          <table>
+            <thead>
+              <tr>
+                <th>Phase</th>
+                <th>Entity name</th>
+                <th>Name</th>
+                <th>Type</th>
+                <th>Source</th>
+                <th>Children</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="loadsTable"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div id="editorCard" class="card stack hidden">
+        <div class="phase-title">
+          <h2>Edit sensor</h2>
+          <span id="editorTypePill" class="pill">-</span>
+        </div>
+
+        <div class="grid-4">
+          <div id="editorPhaseWrap">
+            <label>Phase</label>
+            <select id="editorPhase">
+              <option value="l1">L1</option>
+              <option value="l2">L2</option>
+              <option value="l3">L3</option>
+              <option value="single">1 phase</option>
+            </select>
+          </div>
+          <div>
+            <label>Internal ID</label>
+            <input id="editorId" />
+          </div>
+          <div>
+            <label>Name</label>
+            <input id="editorName" />
+          </div>
+          <div>
+            <label>Type</label>
+            <input id="editorType" readonly />
+          </div>
+        </div>
+
+        <div id="editorMeasuredWrap" class="stack">
+          <div class="grid-2">
+            <div>
+              <label>Source power sensor</label>
+              <input id="editorSource" />
+            </div>
+            <div id="editorBranchToggleWrap" class="check" style="align-self:end;">
+              <input type="checkbox" id="editorIsBranch" />
+              <label for="editorIsBranch" style="margin:0;">Use as branch residual</label>
+            </div>
+          </div>
+
+          <div id="editorBranchWrap" class="stack hidden">
+            <div>
+              <label>Children sensors</label>
+              <div id="editorChildrenList" class="child-picker"></div>
+            </div>
+            <div class="note">Only sensors from the same phase are used. Branch sensors cannot be selected as children. Invalid saved children are ignored during YAML generation.</div>
+          </div>
+        </div>
+
+        <div id="editorCalcWrap" class="stack hidden">
+          <div class="grid-2">
+            <div>
+              <label>Entity</label>
+              <input id="editorEntity" />
+            </div>
+            <div id="editorFixedWrap">
+              <label>Power</label>
+              <input id="editorPower" type="number" min="0" step="0.1" />
+            </div>
+          </div>
+          <div id="editorLightWrap" class="grid-2 hidden">
+            <div>
+              <label>Min power</label>
+              <input id="editorMinPower" type="number" min="0" step="0.1" />
+            </div>
+            <div>
+              <label>Max power</label>
+              <input id="editorMaxPower" type="number" min="0" step="0.1" />
+            </div>
+          </div>
+        </div>
+
+        <div class="note">
+          Sensor type cannot be changed between measured and calculated. A measured sensor can be switched to branch residual mode and back. In 3-phase mode you can change the phase. Summary sensors are rebuilt automatically from the current sensor list when YAML is generated.
+        </div>
+
+        <div class="actions">
+          <button id="saveEditBtn" class="success">Save changes</button>
+          <button id="cancelEditBtn" class="secondary">Cancel</button>
+        </div>
+      </div>
+
+      <div class="card stack">
+        <h2>Outputs</h2>
+        <div class="actions">
+          <button id="copyBtn" class="secondary">Copy YAML</button>
+          <select id="sankeyFormat" style="max-width: 220px;">
+            <option value="panel">Sankey format: Panel view</option>
+            <option value="card">Sankey format: Card YAML</option>
+          </select>
+          <button id="generateSankeyBtn" class="success">Generate Sankey</button>
+          <button id="copySankeyBtn" class="secondary">Copy Sankey</button>
+          <button id="exportProjectBtn" class="secondary">Export project JSON</button>
+          <button id="importProjectBtn2" class="secondary">Import project JSON</button>
+          <button id="downloadYamlBtn" class="secondary">Download YAML</button>
+          <button id="resetBtn" class="danger">Reset all</button>
+        </div>
+
+        <div class="output-block">
+          <label>Package YAML</label>
+          <textarea id="yamlOutput"></textarea>
+        </div>
+
+        <div class="output-block">
+          <label>Sankey YAML</label>
+          <textarea id="sankeyOutput"></textarea>
+        </div>
+
+        <input type="file" id="importProjectFile2" class="hidden" accept="application/json" />
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const STORAGE_KEY = 'phase_yaml_constructor_single_file_v3';
+    const LEGACY_STORAGE_KEYS = [
+      'phase_yaml_constructor_single_file_v3',
+      'phase_yaml_constructor_single_file_v2',
+      'phase_yaml_constructor_single_file_v1'
+    ];
+
+    const loads = [];
+    let editIndex = null;
+
+    function getTodayLocalDate() {
+      const d = new Date();
+      return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+    }
+
+    function nowStamp() {
+      const d = new Date();
+      return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')} ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
+    }
+
+    function generateUid() {
+      return `ld_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 8)}`;
+    }
+
+    function sanitizeId(v) {
+      return (v || '')
+        .toLowerCase()
+        .trim()
+        .replace(/[^a-z0-9_]+/g, '_')
+        .replace(/^_+|_+$/g, '')
+        .replace(/_+/g, '_');
+    }
+
+    function entityNameFor(load, mode) {
+      return mode === '1'
+        ? `phase_${load.id}${load.isCalculated ? '_calc' : ''}`
+        : `phase_${load.phase}_${load.id}${load.isCalculated ? '_calc' : ''}`;
+    }
+
+    function getLoadByUid(uid) {
+      return loads.find(load => load.uid === uid) || null;
+    }
+
+    function buildTypeLabel(load) {
+      if (load.isCalculated) return load.isLight ? 'light calc' : 'calculated';
+      return load.isBranch ? 'branch residual' : 'measured';
+    }
+
+    function buildTypePill(load) {
+      if (load.isCalculated) return load.isLight ? 'Light calc' : 'Calculated';
+      return load.isBranch ? 'Branch residual' : 'Measured';
+    }
+
+    function buildFriendlyName(load) {
+      if (load.isCalculated) return `${load.name} (calculated)`;
+      if (load.isBranch) return `${load.name} (branch residual)`;
+      return load.name;
+    }
+
+    function measuredState(source) {
+      return `{{ states('${source}') | float(0) }}`;
+    }
+
+    function calcFixedState(entity, power) {
+      return `{{ ${Number(power)} if is_state('${entity}', 'on') else 0 }}`;
+    }
+
+    function calcLightState(entity, minPower, maxPower) {
+      return [
+        `{% set brightness = state_attr('${entity}', 'brightness') %}`,
+        `{% set level = [[brightness | float(255), 0] | max, 255] | min %}`,
+        `{% set min_power = ${Number(minPower)} %}`,
+        `{% set max_power = ${Number(maxPower)} %}`,
+        `{{ (min_power + ((max_power - min_power) * level / 255)) | round(1) if is_state('${entity}', 'on') else 0 }}`
+      ].join('\n');
+    }
+
+    function getValidBranchChildren(parentLoad, mode) {
+      const children = Array.isArray(parentLoad.children) ? parentLoad.children : [];
+      return children
+        .map(uid => getLoadByUid(uid))
+        .filter(child =>
+          child &&
+          child.uid !== parentLoad.uid &&
+          !child.isBranch &&
+          child.phase === parentLoad.phase &&
+          entityNameFor(child, mode)
+        );
+    }
+
+    function branchState(parentLoad, mode) {
+      const validChildren = getValidBranchChildren(parentLoad, mode);
+      if (!validChildren.length) {
+        return [
+          '{{',
+          '  [',
+          `    states('${parentLoad.source}') | float(0),`,
+          '    0',
+          '  ] | max',
+          '}}'
+        ].join('\n');
+      }
+
+      const lines = [];
+      lines.push('{{');
+      lines.push('  [');
+      lines.push(`    states('${parentLoad.source}') | float(0) -`);
+      lines.push('    (');
+      validChildren.forEach((child, idx) => {
+        const suffix = idx === validChildren.length - 1 ? '' : ' +';
+        lines.push(`      states('sensor.${entityNameFor(child, mode)}') | float(0)${suffix}`);
+      });
+      lines.push('    ),');
+      lines.push('    0');
+      lines.push('  ] | max');
+      lines.push('}}');
+      return lines.join('\n');
+    }
+
+    function collectState() {
+      return {
+        packageName: document.getElementById('packageName').value,
+        mode: document.getElementById('mode').value,
+        updatedDate: document.getElementById('updatedDate').value,
+        configFileName: document.getElementById('configFileName').value,
+        yamlFileName: document.getElementById('yamlFileName').value,
+        inputL1: document.getElementById('inputL1').value,
+        inputL2: document.getElementById('inputL2').value,
+        inputL3: document.getElementById('inputL3').value,
+        inputSingle: document.getElementById('inputSingle').value,
+        yamlOutput: document.getElementById('yamlOutput').value,
+        sankeyOutput: document.getElementById('sankeyOutput').value,
+        sankeyFormat: document.getElementById('sankeyFormat').value,
+        lastGeneratedInfo: document.getElementById('lastGeneratedInfo').value,
+        loads
+      };
+    }
+
+    function saveState() {
+      if (document.getElementById('app').classList.contains('hidden')) return;
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(collectState()));
+    }
+
+    function clearLoads() {
+      loads.length = 0;
+    }
+
+    function syncCard(card) {
+      const calc = card.querySelector('.field-calc').checked;
+      const light = card.querySelector('.field-light').checked;
+      card.querySelector('.light-check-wrap').classList.toggle('hidden', !calc);
+      card.querySelector('.measured-wrap').classList.toggle('hidden', calc);
+      card.querySelector('.calc-wrap').classList.toggle('hidden', !calc);
+      card.querySelector('.fixed-wrap').classList.toggle('hidden', !calc || light);
+      card.querySelector('.light-wrap').classList.toggle('hidden', !calc || !light);
+      if (!calc) card.querySelector('.field-light').checked = false;
+    }
+
+    function clearCard(card) {
+      card.querySelectorAll('input').forEach(input => {
+        if (input.type === 'checkbox') input.checked = false;
+        else input.value = '';
+      });
+      syncCard(card);
+    }
+
+    function clearAllCards() {
+      document.querySelectorAll('.phase-card').forEach(clearCard);
+    }
+
+    function renderChildrenPicker(parentLoad) {
+      const list = document.getElementById('editorChildrenList');
+      const mode = document.getElementById('mode').value;
+      list.innerHTML = '';
+
+      const candidates = loads.filter(load => {
+        if (!parentLoad) return false;
+        if (load.uid === parentLoad.uid) return false;
+        if (load.isBranch) return false;
+        if (load.phase !== parentLoad.phase) return false;
+        return true;
+      });
+
+      if (!candidates.length) {
+        const empty = document.createElement('div');
+        empty.className = 'child-sub';
+        empty.textContent = 'No eligible sensors for this phase.';
+        list.appendChild(empty);
+        return;
+      }
+
+      const selected = new Set(Array.isArray(parentLoad.children) ? parentLoad.children : []);
+      candidates.forEach(load => {
+        const row = document.createElement('label');
+        row.className = 'child-item';
+
+        const checkbox = document.createElement('input');
+        checkbox.type = 'checkbox';
+        checkbox.value = load.uid;
+        checkbox.checked = selected.has(load.uid);
+
+        const meta = document.createElement('div');
+        meta.className = 'child-meta';
+
+        const main = document.createElement('div');
+        main.className = 'child-main';
+        main.textContent = `${load.name} - sensor.${entityNameFor(load, mode)}`;
+
+        const sub = document.createElement('div');
+        sub.className = 'child-sub';
+        sub.textContent = `${buildTypeLabel(load)} | ${load.phase === 'single' ? '1 phase' : load.phase.toUpperCase()}`;
+
+        meta.appendChild(main);
+        meta.appendChild(sub);
+        row.appendChild(checkbox);
+        row.appendChild(meta);
+        list.appendChild(row);
+      });
+    }
+
+    function getEditorSelectedChildren() {
+      return Array.from(document.querySelectorAll('#editorChildrenList input[type="checkbox"]:checked')).map(el => el.value);
+    }
+
+    function resetEditor() {
+      editIndex = null;
+      document.getElementById('editorCard').classList.add('hidden');
+      document.getElementById('editorPhase').value = 'l1';
+      document.getElementById('editorId').value = '';
+      document.getElementById('editorName').value = '';
+      document.getElementById('editorType').value = '';
+      document.getElementById('editorTypePill').textContent = '-';
+      document.getElementById('editorSource').value = '';
+      document.getElementById('editorEntity').value = '';
+      document.getElementById('editorPower').value = '';
+      document.getElementById('editorMinPower').value = '';
+      document.getElementById('editorMaxPower').value = '';
+      document.getElementById('editorIsBranch').checked = false;
+      document.getElementById('editorChildrenList').innerHTML = '';
+      document.getElementById('editorMeasuredWrap').classList.remove('hidden');
+      document.getElementById('editorCalcWrap').classList.add('hidden');
+      document.getElementById('editorFixedWrap').classList.remove('hidden');
+      document.getElementById('editorLightWrap').classList.add('hidden');
+      document.getElementById('editorBranchToggleWrap').classList.remove('hidden');
+      document.getElementById('editorBranchWrap').classList.add('hidden');
+    }
+
+    function updateEditorVisibility(load) {
+      const mode = document.getElementById('mode').value;
+      const phaseWrap = document.getElementById('editorPhaseWrap');
+      const phaseSelect = document.getElementById('editorPhase');
+      const measuredWrap = document.getElementById('editorMeasuredWrap');
+      const calcWrap = document.getElementById('editorCalcWrap');
+      const fixedWrap = document.getElementById('editorFixedWrap');
+      const lightWrap = document.getElementById('editorLightWrap');
+      const branchToggleWrap = document.getElementById('editorBranchToggleWrap');
+      const branchWrap = document.getElementById('editorBranchWrap');
+      const isBranchToggle = document.getElementById('editorIsBranch');
+
+      phaseWrap.classList.toggle('hidden', mode !== '3');
+      if (mode === '1') phaseSelect.value = 'single';
+
+      measuredWrap.classList.toggle('hidden', load.isCalculated);
+      calcWrap.classList.toggle('hidden', !load.isCalculated);
+      fixedWrap.classList.toggle('hidden', !load.isCalculated || load.isLight);
+      lightWrap.classList.toggle('hidden', !load.isCalculated || !load.isLight);
+
+      branchToggleWrap.classList.toggle('hidden', load.isCalculated);
+      branchWrap.classList.toggle('hidden', load.isCalculated || !isBranchToggle.checked);
+
+      if (!load.isCalculated && isBranchToggle.checked) {
+        renderChildrenPicker({
+          ...load,
+          phase: phaseSelect.value || load.phase,
+          children: Array.isArray(load.children) ? load.children : []
+        });
+      }
+    }
+
+    function refreshEditorForPhaseChange() {
+      if (editIndex === null || !loads[editIndex]) return;
+      const original = loads[editIndex];
+      if (original.isCalculated) return;
+      const temp = {
+        ...original,
+        phase: document.getElementById('mode').value === '1' ? 'single' : document.getElementById('editorPhase').value,
+        children: getEditorSelectedChildren()
+      };
+      renderChildrenPicker(temp);
+    }
+
+    function editLoad(realIndex) {
+      const load = loads[realIndex];
+      if (!load) return;
+
+      editIndex = realIndex;
+      document.getElementById('editorCard').classList.remove('hidden');
+      document.getElementById('editorPhase').value = load.phase || 'l1';
+      document.getElementById('editorId').value = load.id || '';
+      document.getElementById('editorName').value = load.name || '';
+      document.getElementById('editorType').value = buildTypeLabel(load);
+      document.getElementById('editorTypePill').textContent = buildTypePill(load);
+      document.getElementById('editorSource').value = load.source || '';
+      document.getElementById('editorEntity').value = load.entity || '';
+      document.getElementById('editorPower').value = load.power || '';
+      document.getElementById('editorMinPower').value = load.minPower || '';
+      document.getElementById('editorMaxPower').value = load.maxPower || '';
+      document.getElementById('editorIsBranch').checked = !!load.isBranch;
+
+      updateEditorVisibility(load);
+      document.getElementById('editorCard').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    function saveEditedLoad() {
+      if (editIndex === null || !loads[editIndex]) return;
+
+      const original = loads[editIndex];
+      const mode = document.getElementById('mode').value;
+      const phase = mode === '1' ? 'single' : document.getElementById('editorPhase').value;
+      const id = sanitizeId(document.getElementById('editorId').value);
+      const name = document.getElementById('editorName').value.trim();
+      const source = document.getElementById('editorSource').value.trim();
+      const entity = document.getElementById('editorEntity').value.trim();
+      const power = document.getElementById('editorPower').value.trim();
+      const minPower = document.getElementById('editorMinPower').value.trim();
+      const maxPower = document.getElementById('editorMaxPower').value.trim();
+      const isBranch = !original.isCalculated && document.getElementById('editorIsBranch').checked;
+      const children = isBranch ? getEditorSelectedChildren() : [];
+
+      if (!id || !name) return alert('Sensor ID and name are required.');
+      if (!original.isCalculated && !source) return alert('Specify the power sensor.');
+      if (original.isCalculated && !entity) return alert('Specify the entity.');
+      if (original.isCalculated && !original.isLight && power === '') return alert('Specify the power value.');
+      if (original.isCalculated && original.isLight && (minPower === '' || maxPower === '')) return alert('Specify min power and max power.');
+
+      const updated = {
+        ...original,
+        phase,
+        id,
+        name,
+        isBranch,
+        children,
+        source: original.isCalculated ? '' : source,
+        entity: original.isCalculated ? entity : '',
+        power: original.isCalculated && !original.isLight ? power : '',
+        minPower: original.isCalculated && original.isLight ? minPower : '',
+        maxPower: original.isCalculated && original.isLight ? maxPower : ''
+      };
+
+      const newEntityName = entityNameFor(updated, mode);
+      const conflict = loads.some((load, index) => index !== editIndex && entityNameFor(load, mode) === newEntityName);
+      if (conflict) return alert('A sensor with this entity name already exists.');
+
+      loads[editIndex] = updated;
+      renderLoads();
+      generateSankeyYaml();
+      saveState();
+      generateYaml();
+      generateSankeyYaml();
+      resetEditor();
+    }
+
+    function updateModeVisibility() {
+      if (document.getElementById('app').classList.contains('hidden')) return;
+      const mode = document.getElementById('mode').value;
+
+      document.getElementById('inputs3Wrap').classList.toggle('hidden', mode !== '3');
+      document.getElementById('inputs1Wrap').classList.toggle('hidden', mode !== '1');
+
+      const cols = document.querySelectorAll('#phaseColumns .phase-card');
+      cols[1].classList.toggle('hidden', mode !== '3');
+      cols[2].classList.toggle('hidden', mode !== '3');
+      cols[0].querySelector('.phase-label').textContent = mode === '1' ? '1 phase' : 'Phase 1';
+      cols[0].querySelector('.pill').textContent = mode === '1' ? '1P' : 'L1';
+
+      if (editIndex !== null && loads[editIndex]) {
+        updateEditorVisibility(loads[editIndex]);
+      }
+
+      renderLoads();
+      saveState();
+    }
+
+    function renderLoads() {
+      const tbody = document.getElementById('loadsTable');
+      if (!tbody) return;
+
+      const mode = document.getElementById('app').classList.contains('hidden') ? '3' : document.getElementById('mode').value;
+      const visibleLoads = mode === '1' ? loads.filter(l => l.phase === 'single') : loads.filter(l => l.phase !== 'single');
+
+      tbody.innerHTML = '';
+
+      visibleLoads.forEach(load => {
+        const realIndex = loads.findIndex(x => x === load);
+        const childrenCount = load.isBranch ? getValidBranchChildren(load, mode).length : 0;
+        const source = !load.isCalculated ? load.source : load.entity;
+        const row = document.createElement('tr');
+
+        row.innerHTML = `
+          <td>${load.phase === 'single' ? '1 phase' : load.phase.toUpperCase()}</td>
+          <td>${entityNameFor(load, mode)}</td>
+          <td>${load.name}</td>
+          <td>${buildTypeLabel(load)}</td>
+          <td>${source}</td>
+          <td>${load.isBranch ? childrenCount : '-'}</td>
+          <td>
+            <div class="row-actions">
+              <button class="warning edit-btn" data-i="${realIndex}">Edit</button>
+              <button class="danger delete-btn" data-i="${realIndex}">Delete</button>
+            </div>
+          </td>`;
+        tbody.appendChild(row);
+      });
+
+      document.getElementById('countPill').textContent = String(visibleLoads.length);
+
+      tbody.querySelectorAll('.edit-btn').forEach(btn => {
+        btn.addEventListener('click', () => editLoad(Number(btn.dataset.i)));
+      });
+
+      tbody.querySelectorAll('.delete-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const realIndex = Number(btn.dataset.i);
+          if (realIndex < 0 || !loads[realIndex]) return;
+          const removed = loads[realIndex];
+          loads.splice(realIndex, 1);
+
+          loads.forEach(load => {
+            if (Array.isArray(load.children)) {
+              load.children = load.children.filter(uid => uid !== removed.uid);
+            }
+          });
+
+          if (editIndex === realIndex) resetEditor();
+          else if (editIndex !== null && realIndex < editIndex) editIndex -= 1;
+
+          renderLoads();
+          saveState();
+          generateYaml();
+          generateSankeyYaml();
+          generateSankeyYaml();
+        });
+      });
+    }
+
+    function addLoad(card) {
+      const mode = document.getElementById('mode').value;
+      const phase = mode === '1' ? 'single' : card.dataset.phase;
+      const id = sanitizeId(card.querySelector('.field-id').value);
+      const name = card.querySelector('.field-name').value.trim();
+      const isCalculated = card.querySelector('.field-calc').checked;
+      const isLight = card.querySelector('.field-light').checked;
+      const source = card.querySelector('.field-source').value.trim();
+      const entity = card.querySelector('.field-entity').value.trim();
+      const power = card.querySelector('.field-power').value.trim();
+      const minPower = card.querySelector('.field-min-power').value.trim();
+      const maxPower = card.querySelector('.field-max-power').value.trim();
+
+      if (!id || !name) return alert('Sensor ID and name are required.');
+      if (!isCalculated && !source) return alert('Specify the power sensor.');
+      if (isCalculated && !entity) return alert('Specify the entity.');
+      if (isCalculated && !isLight && power === '') return alert('Specify the power value.');
+      if (isCalculated && isLight && (minPower === '' || maxPower === '')) return alert('Specify min power and max power.');
+
+      const generated = entityNameFor({ phase, id, isCalculated }, mode);
+      if (loads.some(l => entityNameFor(l, mode) === generated)) return alert('A sensor with this entity name already exists.');
+
+      loads.push({
+        uid: generateUid(),
+        phase,
+        id,
+        name,
+        isCalculated,
+        isLight,
+        isBranch: false,
+        children: [],
+        source,
+        entity,
+        power,
+        minPower,
+        maxPower
+      });
+
+      clearCard(card);
+      renderLoads();
+      saveState();
+      generateYaml();
+      generateSankeyYaml();
+    }
+
+
+    function getTopLevelLoads(activeLoads, mode) {
+      const childUidSet = new Set();
+
+      activeLoads.forEach(load => {
+        if (!load.isCalculated && load.isBranch) {
+          getValidBranchChildren(load, mode).forEach(child => childUidSet.add(child.uid));
+        }
+      });
+
+      return activeLoads.filter(load => !childUidSet.has(load.uid));
+    }
+
+    function yamlEscape(value) {
+      return String(value).replace(/'/g, "''");
+    }
+
+    function generateSankeyYaml() {
+      if (document.getElementById('app').classList.contains('hidden')) return;
+
+      const mode = document.getElementById('mode').value;
+      const viewTitle = mode === '3' ? 'Phase power attribution' : 'Power attribution';
+      const viewPath = mode === '3' ? 'phase_power_attribution' : 'power_attribution';
+      const viewIcon = 'mdi:chart-sankey';
+      const activeLoads = mode === '1' ? loads.filter(l => l.phase === 'single') : loads.filter(l => l.phase !== 'single');
+      const topLevelLoads = getTopLevelLoads(activeLoads, mode);
+      const lines = [];
+
+      function push(...xs) {
+        lines.push(...xs);
+      }
+
+      function esc(value) {
+        return String(value).replace(/'/g, "''");
+      }
+
+      function phaseColor(phase) {
+        if (phase === 'l1') return '#f59e0b';
+        if (phase === 'l2') return '#0ea5e9';
+        if (phase === 'l3') return '#22c55e';
+        return '#60a5fa';
+      }
+
+      function phaseChildColor(phase) {
+        if (phase === 'l1') return '#fcd34d';
+        if (phase === 'l2') return '#7dd3fc';
+        if (phase === 'l3') return '#86efac';
+        return '#93c5fd';
+      }
+
+      function branchColor(phase) {
+        if (phase === 'l1') return '#d97706';
+        if (phase === 'l2') return '#2563eb';
+        if (phase === 'l3') return '#16a34a';
+        return '#3b82f6';
+      }
+
+      function otherColor(phase) {
+        if (phase === 'l1') return '#ef4444';
+        if (phase === 'l2') return '#f97316';
+        if (phase === 'l3') return '#e11d48';
+        return '#ef4444';
+      }
+
+      function pushEntityObject(indent, obj) {
+        push(`${indent}- entity_id: ${obj.entity_id}`);
+        if (obj.type) push(`${indent}  type: ${obj.type}`);
+        if (obj.name) push(`${indent}  name: '${esc(obj.name)}'`);
+        if (obj.icon) push(`${indent}  icon: ${obj.icon}`);
+        if (obj.color) {
+          const colorValue = String(obj.color).startsWith('#') ? `'${obj.color}'` : obj.color;
+          push(`${indent}  color: ${colorValue}`);
+        }
+        if (obj.children && obj.children.length) {
+          push(`${indent}  children:`);
+          obj.children.forEach(child => {
+            if (typeof child === 'string') {
+              push(`${indent}    - ${child}`);
+            } else {
+              push(`${indent}    - entity_id: ${child.entity_id}`);
+              if (child.connection_entity_id) push(`${indent}      connection_entity_id: ${child.connection_entity_id}`);
+            }
+          });
+        }
+      }
+
+      const sankeyFormat = document.getElementById('sankeyFormat').value;
+
+      if (sankeyFormat === 'panel') {
+        push(`title: ${viewTitle}`);
+        push(`path: ${viewPath}`);
+        push(`icon: ${viewIcon}`);
+        push('type: panel');
+        push('cards:');
+        push('  - type: custom:sankey-chart');
+        push(`    title: ${viewTitle}`);
+        push('    layout: horizontal');
+        push('    wide: true');
+        push('    height: 420');
+        push('    show_names: true');
+        push('    show_icons: true');
+        push('    show_states: true');
+        push('    show_units: true');
+        push('    round: 1');
+        push('    min_box_size: 3');
+        push('    sections:');
+      } else {
+        push('type: custom:sankey-chart');
+        push(`title: ${viewTitle}`);
+        push('layout: horizontal');
+        push('wide: true');
+        push('height: 420');
+        push('show_names: true');
+        push('show_icons: true');
+        push('show_states: true');
+        push('show_units: true');
+        push('round: 1');
+        push('min_box_size: 3');
+        push('sections:');
+      }
+
+      if (mode === '3') {
+        const phases = [
+          { key: 'l1', source: document.getElementById('inputL1').value.trim(), otherId: 'phase_l1_other', otherName: 'L1 unknown load' },
+          { key: 'l2', source: document.getElementById('inputL2').value.trim(), otherId: 'phase_l2_other', otherName: 'L2 unknown load' },
+          { key: 'l3', source: document.getElementById('inputL3').value.trim(), otherId: 'phase_l3_other', otherName: 'L3 unknown load' }
+        ];
+
+        const section0 = [];
+        const section1 = [];
+        const section2 = [];
+        const usedSection2 = new Set();
+
+        phases.forEach(phase => {
+          if (!phase.source) return;
+
+          const phaseTop = topLevelLoads.filter(load => load.phase === phase.key);
+          const children = phaseTop.map(load => `sensor.${entityNameFor(load, mode)}`);
+          children.push(phase.otherId);
+
+          section0.push({
+            entity_id: phase.source,
+            color: phaseColor(phase.key),
+            children
+          });
+
+          section1.push({
+            entity_id: phase.otherId,
+            type: 'remaining_parent_state',
+            name: phase.otherName,
+            icon: 'mdi:flash-alert',
+            color: otherColor(phase.key)
+          });
+
+          phaseTop.forEach(load => {
+            const entityObj = {
+              entity_id: `sensor.${entityNameFor(load, mode)}`,
+              name: load.name,
+              color: load.isBranch ? branchColor(load.phase) : phaseColor(load.phase)
+            };
+
+            if (load.isBranch) {
+              const validChildren = getValidBranchChildren(load, mode);
+              if (validChildren.length) {
+                entityObj.icon = 'mdi:source-branch';
+                entityObj.children = validChildren.map(child => `sensor.${entityNameFor(child, mode)}`);
+                validChildren.forEach(child => {
+                  const childEntity = `sensor.${entityNameFor(child, mode)}`;
+                  if (!usedSection2.has(childEntity)) {
+                    section2.push({
+                      entity_id: childEntity,
+                      name: child.name,
+                      color: phaseChildColor(child.phase)
+                    });
+                    usedSection2.add(childEntity);
+                  }
+                });
+              }
+            }
+
+            section1.push(entityObj);
+          });
+        });
+
+        push(sankeyFormat === 'panel' ? '      - entities:' : '  - entities:');
+        section0.forEach(obj => pushEntityObject(sankeyFormat === 'panel' ? '          ' : '      ', obj));
+        push(sankeyFormat === 'panel' ? '      - entities:' : '  - entities:');
+        section1.forEach(obj => pushEntityObject(sankeyFormat === 'panel' ? '          ' : '      ', obj));
+        if (section2.length) {
+          push(sankeyFormat === 'panel' ? '      - entities:' : '  - entities:');
+          section2.forEach(obj => pushEntityObject(sankeyFormat === 'panel' ? '          ' : '      ', obj));
+        }
+      } else {
+        const source = document.getElementById('inputSingle').value.trim();
+        const otherId = 'phase_other';
+        const section0 = [];
+        const section1 = [];
+        const section2 = [];
+        const usedSection2 = new Set();
+
+        if (source) {
+          section0.push({
+            entity_id: source,
+            color: 'var(--primary-color)',
+            children: [...topLevelLoads.map(load => `sensor.${entityNameFor(load, mode)}`), otherId]
+          });
+        }
+
+        section1.push({
+          entity_id: otherId,
+          type: 'remaining_parent_state',
+          name: 'Unknown load',
+          icon: 'mdi:flash-alert',
+          color: '#ef4444'
+        });
+
+        topLevelLoads.forEach(load => {
+          const entityObj = {
+            entity_id: `sensor.${entityNameFor(load, mode)}`,
+            name: load.name,
+            color: load.isBranch ? '#2563eb' : '#60a5fa'
+          };
+
+          if (load.isBranch) {
+            const validChildren = getValidBranchChildren(load, mode);
+            if (validChildren.length) {
+              entityObj.icon = 'mdi:source-branch';
+              entityObj.children = validChildren.map(child => `sensor.${entityNameFor(child, mode)}`);
+              validChildren.forEach(child => {
+                const childEntity = `sensor.${entityNameFor(child, mode)}`;
+                if (!usedSection2.has(childEntity)) {
+                  section2.push({
+                    entity_id: childEntity,
+                    name: child.name,
+                    color: '#93c5fd'
+                  });
+                  usedSection2.add(childEntity);
+                }
+              });
+            }
+          }
+
+          section1.push(entityObj);
+        });
+
+        push(sankeyFormat === 'panel' ? '      - entities:' : '  - entities:');
+        section0.forEach(obj => pushEntityObject(sankeyFormat === 'panel' ? '          ' : '      ', obj));
+        push(sankeyFormat === 'panel' ? '      - entities:' : '  - entities:');
+        section1.forEach(obj => pushEntityObject(sankeyFormat === 'panel' ? '          ' : '      ', obj));
+        if (section2.length) {
+          push(sankeyFormat === 'panel' ? '      - entities:' : '  - entities:');
+          section2.forEach(obj => pushEntityObject(sankeyFormat === 'panel' ? '          ' : '      ', obj));
+        }
+      }
+
+      document.getElementById('sankeyOutput').value = lines.join('\n');
+      saveState();
+    }
+
+
+    function generateYaml() {
+      if (document.getElementById('app').classList.contains('hidden')) return;
+
+      const mode = document.getElementById('mode').value;
+      const pkg = sanitizeId(document.getElementById('packageName').value) || 'phase_sensor';
+      const date = getTodayLocalDate();
+      const l1 = document.getElementById('inputL1').value.trim();
+      const l2 = document.getElementById('inputL2').value.trim();
+      const l3 = document.getElementById('inputL3').value.trim();
+      const single = document.getElementById('inputSingle').value.trim();
+
+      const activeLoads = mode === '1' ? loads.filter(l => l.phase === 'single') : loads.filter(l => l.phase !== 'single');
+      const calculatedLoads = activeLoads.filter(l => l.isCalculated);
+      const branchLoads = activeLoads.filter(l => !l.isCalculated && l.isBranch);
+      const measuredLoads = activeLoads.filter(l => !l.isCalculated && !l.isBranch);
+
+      const lines = [];
+      const push = (...xs) => lines.push(...xs);
+
+      function pushSectionComment(indent, title) {
+        push(`${indent}## ${title}`);
+      }
+
+      push('##################################################');
+      push(`## Updated: ${date}`);
+      push('##################################################');
+      push(`${pkg}:`);
+      push('  ##################################################');
+      push('  ## CUSTOMIZE');
+      push('  ##################################################');
+      push('  homeassistant:');
+      push('    customize:');
+
+      if (calculatedLoads.length) {
+        pushSectionComment('      ', 'CALCULATED SENSORS');
+        if (mode === '3') {
+          ['l1', 'l2', 'l3'].forEach(p => {
+            const items = calculatedLoads.filter(l => l.phase === p);
+            if (!items.length) return;
+            pushSectionComment('      ', `PHASE ${p.toUpperCase()}`);
+            items.forEach(load => {
+              push(`      sensor.${entityNameFor(load, mode)}:`);
+              push(`        friendly_name: ${buildFriendlyName(load)}`);
+              push('        unit_of_measurement: Вт');
+              push('        icon: mdi:flash-outline');
+            });
+          });
+        } else {
+          calculatedLoads.forEach(load => {
+            push(`      sensor.${entityNameFor(load, mode)}:`);
+            push(`        friendly_name: ${buildFriendlyName(load)}`);
+            push('        unit_of_measurement: Вт');
+            push('        icon: mdi:flash-outline');
+          });
+        }
+      }
+
+      if (measuredLoads.length) {
+        pushSectionComment('      ', 'MEASURED SENSORS');
+        if (mode === '3') {
+          ['l1', 'l2', 'l3'].forEach(p => {
+            const items = measuredLoads.filter(l => l.phase === p);
+            if (!items.length) return;
+            pushSectionComment('      ', `PHASE ${p.toUpperCase()}`);
+            items.forEach(load => {
+              push(`      sensor.${entityNameFor(load, mode)}:`);
+              push(`        friendly_name: ${buildFriendlyName(load)}`);
+              push('        unit_of_measurement: Вт');
+              push('        icon: mdi:flash');
+            });
+          });
+        } else {
+          measuredLoads.forEach(load => {
+            push(`      sensor.${entityNameFor(load, mode)}:`);
+            push(`        friendly_name: ${buildFriendlyName(load)}`);
+            push('        unit_of_measurement: Вт');
+            push('        icon: mdi:flash');
+          });
+        }
+      }
+
+      if (branchLoads.length) {
+        pushSectionComment('      ', 'BRANCH RESIDUAL SENSORS');
+        if (mode === '3') {
+          ['l1', 'l2', 'l3'].forEach(p => {
+            const items = branchLoads.filter(l => l.phase === p);
+            if (!items.length) return;
+            pushSectionComment('      ', `PHASE ${p.toUpperCase()}`);
+            items.forEach(load => {
+              push(`      sensor.${entityNameFor(load, mode)}:`);
+              push(`        friendly_name: ${buildFriendlyName(load)}`);
+              push('        unit_of_measurement: Вт');
+              push('        icon: mdi:source-branch');
+            });
+          });
+        } else {
+          branchLoads.forEach(load => {
+            push(`      sensor.${entityNameFor(load, mode)}:`);
+            push(`        friendly_name: ${buildFriendlyName(load)}`);
+            push('        unit_of_measurement: Вт');
+            push('        icon: mdi:source-branch');
+          });
+        }
+      }
+
+      pushSectionComment('      ', 'SUMMARY SENSORS');
+      if (mode === '3') {
+        ['l1', 'l2', 'l3'].forEach(p => {
+          push(`      sensor.phase_${p}_identified_power:`);
+          push(`        friendly_name: Phase ${p.toUpperCase()} - identified power`);
+          push('        unit_of_measurement: Вт');
+          push('        icon: mdi:flash-check');
+          push(`      sensor.phase_${p}_unidentified_power:`);
+          push(`        friendly_name: Phase ${p.toUpperCase()} - unidentified power`);
+          push('        unit_of_measurement: Вт');
+          push('        icon: mdi:flash-alert');
+        });
+        push('      sensor.phase_total_input_power:');
+        push('        friendly_name: All phases - total input power');
+        push('        unit_of_measurement: Вт');
+        push('        icon: mdi:flash');
+        push('      sensor.phase_total_identified_power:');
+        push('        friendly_name: All phases - identified power');
+        push('        unit_of_measurement: Вт');
+        push('        icon: mdi:flash-check');
+        push('      sensor.phase_total_unidentified_power:');
+        push('        friendly_name: All phases - unidentified power');
+        push('        unit_of_measurement: Вт');
+        push('        icon: mdi:flash-alert');
+      } else {
+        push('      sensor.phase_identified_power:');
+        push('        friendly_name: Identified power');
+        push('        unit_of_measurement: Вт');
+        push('        icon: mdi:flash-check');
+        push('      sensor.phase_unidentified_power:');
+        push('        friendly_name: Unidentified power');
+        push('        unit_of_measurement: Вт');
+        push('        icon: mdi:flash-alert');
+      }
+
+      const recorderEntities = [];
+      activeLoads.forEach(load => recorderEntities.push(`sensor.${entityNameFor(load, mode)}`));
+      if (mode === '3') {
+        recorderEntities.push(
+          'sensor.phase_l1_identified_power',
+          'sensor.phase_l1_unidentified_power',
+          'sensor.phase_l2_identified_power',
+          'sensor.phase_l2_unidentified_power',
+          'sensor.phase_l3_identified_power',
+          'sensor.phase_l3_unidentified_power',
+          'sensor.phase_total_input_power',
+          'sensor.phase_total_identified_power',
+          'sensor.phase_total_unidentified_power'
+        );
+      } else {
+        recorderEntities.push(
+          'sensor.phase_identified_power',
+          'sensor.phase_unidentified_power'
+        );
+      }
+
+      push('  ##################################################');
+      push('  ## RECORDER');
+      push('  ##################################################');
+      push('  recorder:');
+      push('    include:');
+      push('      entities:');
+      recorderEntities.forEach(entity => push(`        - ${entity}`));
+
+      push('  ##################################################');
+      push('  ## TEMPLATE');
+      push('  ##################################################');
+      push('  template:');
+      push('    - sensor:');
+
+      if (calculatedLoads.length) {
+        pushSectionComment('        ', 'CALCULATED SENSORS');
+        if (mode === '3') {
+          ['l1', 'l2', 'l3'].forEach(p => {
+            const items = calculatedLoads.filter(l => l.phase === p);
+            if (!items.length) return;
+            pushSectionComment('        ', `PHASE ${p.toUpperCase()}`);
+            items.forEach(load => {
+              push(`        - name: ${entityNameFor(load, mode)}`);
+              push(`          unique_id: ${entityNameFor(load, mode)}`);
+              push('          unit_of_measurement: Вт');
+              push('          state: >');
+              const state = load.isLight ? calcLightState(load.entity, load.minPower, load.maxPower) : calcFixedState(load.entity, load.power);
+              state.split('\n').forEach(line => push(`            ${line}`));
+            });
+          });
+        } else {
+          calculatedLoads.forEach(load => {
+            push(`        - name: ${entityNameFor(load, mode)}`);
+            push(`          unique_id: ${entityNameFor(load, mode)}`);
+            push('          unit_of_measurement: Вт');
+            push('          state: >');
+            const state = load.isLight ? calcLightState(load.entity, load.minPower, load.maxPower) : calcFixedState(load.entity, load.power);
+            state.split('\n').forEach(line => push(`            ${line}`));
+          });
+        }
+      }
+
+      if (measuredLoads.length) {
+        pushSectionComment('        ', 'MEASURED SENSORS');
+        if (mode === '3') {
+          ['l1', 'l2', 'l3'].forEach(p => {
+            const items = measuredLoads.filter(l => l.phase === p);
+            if (!items.length) return;
+            pushSectionComment('        ', `PHASE ${p.toUpperCase()}`);
+            items.forEach(load => {
+              push(`        - name: ${entityNameFor(load, mode)}`);
+              push(`          unique_id: ${entityNameFor(load, mode)}`);
+              push('          unit_of_measurement: Вт');
+              push('          state: >');
+              push(`            ${measuredState(load.source)}`);
+            });
+          });
+        } else {
+          measuredLoads.forEach(load => {
+            push(`        - name: ${entityNameFor(load, mode)}`);
+            push(`          unique_id: ${entityNameFor(load, mode)}`);
+            push('          unit_of_measurement: Вт');
+            push('          state: >');
+            push(`            ${measuredState(load.source)}`);
+          });
+        }
+      }
+
+      if (branchLoads.length) {
+        pushSectionComment('        ', 'BRANCH RESIDUAL SENSORS');
+        if (mode === '3') {
+          ['l1', 'l2', 'l3'].forEach(p => {
+            const items = branchLoads.filter(l => l.phase === p);
+            if (!items.length) return;
+            pushSectionComment('        ', `PHASE ${p.toUpperCase()}`);
+            items.forEach(load => {
+              push(`        - name: ${entityNameFor(load, mode)}`);
+              push(`          unique_id: ${entityNameFor(load, mode)}`);
+              push('          unit_of_measurement: Вт');
+              push('          state: >');
+              branchState(load, mode).split('\n').forEach(line => push(`            ${line}`));
+            });
+          });
+        } else {
+          branchLoads.forEach(load => {
+            push(`        - name: ${entityNameFor(load, mode)}`);
+            push(`          unique_id: ${entityNameFor(load, mode)}`);
+            push('          unit_of_measurement: Вт');
+            push('          state: >');
+            branchState(load, mode).split('\n').forEach(line => push(`            ${line}`));
+          });
+        }
+      }
+
+      pushSectionComment('        ', 'SUMMARY SENSORS');
+      if (mode === '3') {
+        ['l1', 'l2', 'l3'].forEach(p => {
+          const list = activeLoads.filter(x => x.phase === p);
+          push(`        - name: phase_${p}_identified_power`);
+          push(`          unique_id: phase_${p}_identified_power`);
+          push('          unit_of_measurement: Вт');
+          push('          state: >');
+          if (list.length) {
+            push('            {{');
+            list.forEach((load, idx) => push(`              states('sensor.${entityNameFor(load, mode)}') | float(0)${idx === list.length - 1 ? '' : ' +'}`));
+            push('            }}');
+          } else {
+            push('            0');
+          }
+
+          const inputEntity = p === 'l1' ? l1 : p === 'l2' ? l2 : l3;
+          push(`        - name: phase_${p}_unidentified_power`);
+          push(`          unique_id: phase_${p}_unidentified_power`);
+          push('          unit_of_measurement: Вт');
+          push('          state: >');
+          push('            {{');
+          push('              [');
+          push(`                states('${inputEntity}') | float(0) -`);
+          push(`                states('sensor.phase_${p}_identified_power') | float(0),`);
+          push('                0');
+          push('              ] | max');
+          push('            }}');
+        });
+
+        push('        - name: phase_total_input_power');
+        push('          unique_id: phase_total_input_power');
+        push('          unit_of_measurement: Вт');
+        push('          state: >');
+        push('            {{');
+        push(`              states('${l1}') | float(0) +`);
+        push(`              states('${l2}') | float(0) +`);
+        push(`              states('${l3}') | float(0)`);
+        push('            }}');
+
+        push('        - name: phase_total_identified_power');
+        push('          unique_id: phase_total_identified_power');
+        push('          unit_of_measurement: Вт');
+        push('          state: >');
+        push('            {{');
+        push("              states('sensor.phase_l1_identified_power') | float(0) +");
+        push("              states('sensor.phase_l2_identified_power') | float(0) +");
+        push("              states('sensor.phase_l3_identified_power') | float(0)");
+        push('            }}');
+
+        push('        - name: phase_total_unidentified_power');
+        push('          unique_id: phase_total_unidentified_power');
+        push('          unit_of_measurement: Вт');
+        push('          state: >');
+        push('            {{');
+        push("              states('sensor.phase_l1_unidentified_power') | float(0) +");
+        push("              states('sensor.phase_l2_unidentified_power') | float(0) +");
+        push("              states('sensor.phase_l3_unidentified_power') | float(0)");
+        push('            }}');
+      } else {
+        push('        - name: phase_identified_power');
+        push('          unique_id: phase_identified_power');
+        push('          unit_of_measurement: Вт');
+        push('          state: >');
+        if (activeLoads.length) {
+          push('            {{');
+          activeLoads.forEach((load, idx) => push(`              states('sensor.${entityNameFor(load, mode)}') | float(0)${idx === activeLoads.length - 1 ? '' : ' +'}`));
+          push('            }}');
+        } else {
+          push('            0');
+        }
+
+        push('        - name: phase_unidentified_power');
+        push('          unique_id: phase_unidentified_power');
+        push('          unit_of_measurement: Вт');
+        push('          state: >');
+        push('            {{');
+        push('              [');
+        push(`                states('${single}') | float(0) -`);
+        push("                states('sensor.phase_identified_power') | float(0),");
+        push('                0');
+        push('              ] | max');
+        push('            }}');
+      }
+
+      document.getElementById('yamlOutput').value = lines.join('\n');
+      document.getElementById('updatedDate').value = date;
+      document.getElementById('lastGeneratedInfo').value = `Generated: ${nowStamp()}`;
+      saveState();
+    }
+
+    function exportProject() {
+      const data = JSON.stringify(collectState(), null, 2);
+      const blob = new Blob([data], { type: 'application/json' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = document.getElementById('configFileName').value || 'phase_constructor_project.json';
+      a.click();
+      URL.revokeObjectURL(a.href);
+    }
+
+    function downloadYaml() {
+      generateYaml();
+      const blob = new Blob([document.getElementById('yamlOutput').value], { type: 'text/yaml' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = document.getElementById('yamlFileName').value || `${sanitizeId(document.getElementById('packageName').value) || 'phase_sensor'}.yaml`;
+      a.click();
+      URL.revokeObjectURL(a.href);
+    }
+
+    function normalizeImportedState(state) {
+      const normalized = state || {};
+      normalized.packageName = normalized.packageName || 'phase_sensor';
+      normalized.mode = normalized.mode || '3';
+      normalized.updatedDate = normalized.updatedDate || getTodayLocalDate();
+      normalized.configFileName = normalized.configFileName || 'phase_constructor_project.json';
+      normalized.yamlFileName = normalized.yamlFileName || `${normalized.packageName}.yaml`;
+      normalized.inputL1 = normalized.inputL1 || '';
+      normalized.inputL2 = normalized.inputL2 || '';
+      normalized.inputL3 = normalized.inputL3 || '';
+      normalized.inputSingle = normalized.inputSingle || '';
+      normalized.yamlOutput = normalized.yamlOutput || '';
+      normalized.sankeyOutput = normalized.sankeyOutput || '';
+      normalized.sankeyFormat = normalized.sankeyFormat || 'panel';
+      normalized.lastGeneratedInfo = normalized.lastGeneratedInfo || '';
+
+      normalized.loads = Array.isArray(normalized.loads) ? normalized.loads.map(load => ({
+        uid: load.uid || generateUid(),
+        phase: load.phase || (normalized.mode === '1' ? 'single' : 'l1'),
+        id: load.id || '',
+        name: load.name || '',
+        isCalculated: !!load.isCalculated,
+        isLight: !!load.isLight,
+        isBranch: !load.isCalculated && !!load.isBranch,
+        children: Array.isArray(load.children) ? load.children.filter(Boolean) : [],
+        source: load.source || '',
+        entity: load.entity || '',
+        power: load.power || '',
+        minPower: load.minPower || '',
+        maxPower: load.maxPower || ''
+      })) : [];
+
+      return normalized;
+    }
+
+    function applyState(state) {
+      const normalized = normalizeImportedState(state);
+      document.getElementById('setupCard').classList.add('hidden');
+      document.getElementById('app').classList.remove('hidden');
+      document.getElementById('packageName').value = normalized.packageName;
+      document.getElementById('mode').value = normalized.mode;
+      document.getElementById('updatedDate').value = normalized.updatedDate;
+      document.getElementById('configFileName').value = normalized.configFileName;
+      document.getElementById('yamlFileName').value = normalized.yamlFileName;
+      document.getElementById('inputL1').value = normalized.inputL1;
+      document.getElementById('inputL2').value = normalized.inputL2;
+      document.getElementById('inputL3').value = normalized.inputL3;
+      document.getElementById('inputSingle').value = normalized.inputSingle;
+      document.getElementById('yamlOutput').value = normalized.yamlOutput;
+      document.getElementById('sankeyOutput').value = normalized.sankeyOutput;
+      document.getElementById('sankeyFormat').value = normalized.sankeyFormat;
+      document.getElementById('lastGeneratedInfo').value = normalized.lastGeneratedInfo;
+
+      clearLoads();
+      normalized.loads.forEach(x => loads.push(x));
+
+      clearAllCards();
+      resetEditor();
+      updateModeVisibility();
+      renderLoads();
+      saveState();
+    }
+
+    function loadSavedState() {
+      const raw = LEGACY_STORAGE_KEYS.map(key => localStorage.getItem(key)).find(Boolean);
+      if (!raw) return false;
+      try {
+        applyState(JSON.parse(raw));
+        return true;
+      } catch {
+        return false;
+      }
+    }
+
+    function resetAll() {
+      if (!confirm('Reset all settings and sensor list?')) return;
+      LEGACY_STORAGE_KEYS.forEach(key => localStorage.removeItem(key));
+      clearLoads();
+      resetEditor();
+      clearAllCards();
+      document.getElementById('app').classList.add('hidden');
+      document.getElementById('setupCard').classList.remove('hidden');
+      document.getElementById('setupPackageName').value = 'phase_sensor';
+      document.getElementById('setupMode').value = '3';
+      document.getElementById('setupDate').value = getTodayLocalDate();
+      document.getElementById('setupConfigFileName').value = 'phase_constructor_project.json';
+      document.getElementById('yamlOutput').value = '';
+      document.getElementById('sankeyOutput').value = '';
+      document.getElementById('lastGeneratedInfo').value = '';
+    }
+
+    function wireEvents() {
+      document.querySelectorAll('.phase-card').forEach(card => {
+        card.querySelector('.field-calc').addEventListener('change', () => syncCard(card));
+        card.querySelector('.field-light').addEventListener('change', () => syncCard(card));
+        card.querySelector('.add-btn').addEventListener('click', () => addLoad(card));
+        syncCard(card);
+      });
+
+      document.getElementById('startBtn').addEventListener('click', () => {
+        const pkg = sanitizeId(document.getElementById('setupPackageName').value) || 'phase_sensor';
+        applyState({
+          packageName: pkg,
+          mode: document.getElementById('setupMode').value,
+          updatedDate: getTodayLocalDate(),
+          configFileName: document.getElementById('setupConfigFileName').value || 'phase_constructor_project.json',
+          yamlFileName: `${pkg}.yaml`,
+          inputL1: '',
+          inputL2: '',
+          inputL3: '',
+          inputSingle: '',
+          yamlOutput: '',
+          lastGeneratedInfo: '',
+          loads: []
+        });
+      });
+
+      document.getElementById('mode').addEventListener('change', () => {
+        resetEditor();
+        updateModeVisibility();
+        generateYaml();
+        generateSankeyYaml();
+      });
+
+      ['packageName', 'configFileName', 'yamlFileName', 'inputL1', 'inputL2', 'inputL3', 'inputSingle'].forEach(id => {
+        document.getElementById(id).addEventListener('input', () => {
+          saveState();
+          generateYaml();
+          generateSankeyYaml();
+          generateSankeyYaml();
+        });
+      });
+
+      document.getElementById('editorIsBranch').addEventListener('change', () => {
+        if (editIndex === null || !loads[editIndex]) return;
+        updateEditorVisibility({ ...loads[editIndex], isBranch: document.getElementById('editorIsBranch').checked });
+      });
+
+      document.getElementById('editorPhase').addEventListener('change', refreshEditorForPhaseChange);
+      document.getElementById('sankeyFormat').addEventListener('change', () => {
+        saveState();
+        generateSankeyYaml();
+      });
+
+      document.getElementById('copyBtn').addEventListener('click', async () => {
+        await navigator.clipboard.writeText(document.getElementById('yamlOutput').value || '');
+        alert('YAML copied.');
+      });
+      document.getElementById('generateSankeyBtn').addEventListener('click', generateSankeyYaml);
+      document.getElementById('copySankeyBtn').addEventListener('click', async () => {
+        await navigator.clipboard.writeText(document.getElementById('sankeyOutput').value || '');
+        alert('Sankey YAML copied.');
+      });
+      document.getElementById('exportProjectBtn').addEventListener('click', exportProject);
+      document.getElementById('downloadYamlBtn').addEventListener('click', downloadYaml);
+      document.getElementById('resetBtn').addEventListener('click', resetAll);
+      document.getElementById('saveEditBtn').addEventListener('click', saveEditedLoad);
+      document.getElementById('cancelEditBtn').addEventListener('click', resetEditor);
+
+      document.getElementById('importProjectBtn').addEventListener('click', () => document.getElementById('importProjectFile').click());
+      document.getElementById('importProjectBtn2').addEventListener('click', () => document.getElementById('importProjectFile2').click());
+
+      document.getElementById('importProjectFile').addEventListener('change', async e => {
+        const f = e.target.files[0];
+        if (!f) return;
+        applyState(JSON.parse(await f.text()));
+        e.target.value = '';
+      });
+
+      document.getElementById('importProjectFile2').addEventListener('change', async e => {
+        const f = e.target.files[0];
+        if (!f) return;
+        applyState(JSON.parse(await f.text()));
+        e.target.value = '';
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      document.getElementById('setupPackageName').value = 'phase_sensor';
+      document.getElementById('setupMode').value = '3';
+      document.getElementById('setupDate').value = getTodayLocalDate();
+      document.getElementById('setupConfigFileName').value = 'phase_constructor_project.json';
+      wireEvents();
+      if (!loadSavedState()) {
+        document.getElementById('sankeyOutput').value = '';
+      }
+    });
+  </script>
+</body>
+</html>
