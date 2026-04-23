@@ -12,7 +12,7 @@
 
 * USDС (ERC-20) - `0x0eb4C9d9627E90a99309D7679E1A046Cdc1A364b`    
 
-* TON - `UQAvhWNC3kqMlYvmZaXrDETfmo0K105tKTrIcejTIZYxpWsW`    
+* TON - `UQDSfvIKjQJ3vEmHQhuijeHfkYoPdMme9bQMuNrZQrLBipFd`    
 
 (Amounts less than 0.0001 cannot be credited to the account.)
 * BTC - `bc1qpqma0ndrmxw70y28esdaghu2pl8ttf97nh0ghc`    
